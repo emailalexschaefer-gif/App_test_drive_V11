@@ -1,5 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 
+// ─── CELEBRATION AUDIO ────────────────────────────────────────────────────────
+var _celebAudio = null;
+function getAudio() {
+  if (!_celebAudio) {
+    _celebAudio = new Audio('/sounds/crowd-cheer.mp3');
+    _celebAudio.preload = 'auto';
+    console.log('Audio file loaded');
+  }
+  return _celebAudio;
+}
+function unlockAudio() {
+  var a = getAudio();
+  a.play().then(function(){a.pause();a.currentTime=0;}).catch(function(){});
+}
+
 // ─── ANALYTICS ──────────────────────────────────────────────────────────────
 // Replace G-XXXXXXXXXX with your real GA4 Measurement ID in index.html
 function trackEvent(name, params) {
@@ -57,6 +72,8 @@ function InjectCSS() {
       .hole-tap:active{transform:scale(0.90)!important;}
       .trophy-bounce{animation:trophyBounce 1.6s ease-in-out infinite;}
       .gold-glow-text{animation:goldGlow 2.4s ease-in-out infinite;}
+      .winner-glow{animation:winnerPulse 2.4s ease-out 0.3s 1;}
+      @keyframes winnerPulse{0%{box-shadow:0 0 0 rgba(201,168,76,0);}40%{box-shadow:0 0 38px rgba(201,168,76,.55),0 0 80px rgba(201,168,76,.2);}100%{box-shadow:0 0 12px rgba(201,168,76,.15);}}
       .leader-row{animation:leaderPulse 3s ease-in-out infinite;}
     `;
     document.head.appendChild(el);
@@ -283,154 +300,159 @@ function ScoreCounter({target}) {
 }
 
 
-// ─── LEAD CAPTURE ────────────────────────────────────────────────────────────
-// STEP 1: Paste your Google Apps Script Web App URL below after deploying
-// See instructions in the README or deployment guide.
-var GOOGLE_SCRIPT_URL = "PASTE_GOOGLE_SCRIPT_URL_HERE";
+// ─── LEAD CAPTURE ─────────────────────────────────────────────────────────────
+// STEP 1: Paste your Google Apps Script Web App URL below.
+// How: Extensions -> Apps Script -> Deploy -> Web app -> Execute as: Me -> Anyone -> Copy URL
+var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymtBDowtk3OAbJhEE8OOavIZKp0R058TMtPeZds-S-rdZ_rQXXXb0ePuVXLjumcxS2/exec";
 
 function LeadModal({onClose}) {
-  var [form,setForm] = useState({firstName:"",email:"",role:"",tripsPerYear:"",groupSize:"",nextTrip:""});
-  var [errors,setErrors] = useState({});
-  var [loading,setLoading] = useState(false);
-  var [success,setSuccess] = useState(false);
-  var [submitErr,setSubmitErr] = useState("");
-  var [prevRole,setPrevRole] = useState("");
+  var [firstName, setFirstName] = useState("");
+  var [email, setEmail] = useState("");
+  var [role, setRole] = useState("");
+  var [tripsPerYear, setTripsPerYear] = useState("");
+  var [groupSize, setGroupSize] = useState("");
+  var [nextTrip, setNextTrip] = useState("");
+  var [showOpt, setShowOpt] = useState(false);
+  var [errors, setErrors] = useState({});
+  var [loading, setLoading] = useState(false);
+  var [success, setSuccess] = useState(false);
+  var [submitErr, setSubmitErr] = useState("");
 
-  // Prevent bg scroll
-  useEffect(function(){
-    document.body.style.overflow="hidden";
-    trackEvent("lead_form_opened");
-    return function(){document.body.style.overflow="";};
-  },[]);
+  useEffect(function() {
+    document.body.style.overflow = "hidden";
+    trackEvent("early_access_opened");
+    return function() { document.body.style.overflow = ""; };
+  }, []);
 
   function validate() {
-    var e={};
-    if(!form.firstName.trim()) e.firstName="Required";
-    if(!form.email.trim()) e.email="Required";
-    else if(!/^[^@]+@[^@]+\.[^@]+$/.test(form.email)) e.email="Enter a valid email";
-    if(!form.role) e.role="Required";
-    if(!form.tripsPerYear) e.tripsPerYear="Required";
-    if(!form.groupSize) e.groupSize="Required";
+    var e = {};
+    if (!firstName.trim()) e.firstName = "Required";
+    if (!email.trim()) e.email = "Required";
+    else if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) e.email = "Enter a valid email";
+    if (!role) e.role = "Select your role";
     return e;
   }
 
-  function handleRole(val) {
-    if(val===form.role) return;
-    setForm(function(p){return {...p,role:val};});
-    if(val==="Player") trackEvent("player_selected");
-    else if(val==="Organiser") trackEvent("organiser_selected");
-    else if(val==="Both"){trackEvent("player_selected");trackEvent("organiser_selected");}
-    setPrevRole(val);
+  function pickRole(val) {
+    if (val === role) return;
+    setRole(val);
+    if (val === "Player") trackEvent("player_selected");
+    else if (val === "Organiser") trackEvent("organiser_selected");
+    else if (val === "Both") { trackEvent("player_selected"); trackEvent("organiser_selected"); }
   }
 
-  function handleChange(field,val){setForm(function(p){return {...p,[field]:val};});}
-
-  async function handleSubmit(e){
-    e.stopPropagation();
-    var errs=validate();
-    if(Object.keys(errs).length>0){setErrors(errs);return;}
-    setLoading(true);setErrors({});setSubmitErr("");
-    var payload={
-      firstName:form.firstName,email:form.email,role:form.role,
-      tripsPerYear:form.tripsPerYear,groupSize:form.groupSize,
-      nextTrip:form.nextTrip,createdAt:new Date().toISOString()
-    };
-    try{
-      var res=await fetch(GOOGLE_SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      trackEvent("lead_form_submitted",{role:form.role,tripsPerYear:form.tripsPerYear,groupSize:form.groupSize});
+  async function handleSubmit(ev) {
+    ev.stopPropagation();
+    var errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    setLoading(true); setErrors({}); setSubmitErr("");
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          firstName: firstName || "",
+          email: email || "",
+          role: role || "",
+          tripsPerYear: tripsPerYear || "",
+          groupSize: groupSize || "",
+          nextTrip: nextTrip || "",
+          createdAt: new Date().toISOString()
+        })
+      });
+      trackEvent("early_access_submitted", { role: role, tripsPerYear: tripsPerYear, groupSize: groupSize });
       setSuccess(true);
-      setTimeout(function(){onClose();},2200);
-    }catch(err){
+      setTimeout(function() { onClose(); }, 5000);
+    } catch(err) {
+      trackEvent("early_access_failed");
       setSubmitErr("Something went wrong. Please try again.");
-    }finally{setLoading(false);}
+    } finally {
+      setLoading(false);
+    }
   }
 
-  var fieldStyle={width:"100%",padding:"10px 13px",background:"rgba(255,255,255,.07)",border:"1px solid rgba(201,168,76,.3)",borderRadius:9,color:"rgba(245,230,184,.92)",fontSize:14,outline:"none",boxSizing:"border-box"};
-  var labelStyle={...T.body,fontSize:11.5,color:"rgba(201,168,76,.7)",fontWeight:700,letterSpacing:.4,marginBottom:4,display:"block"};
-  var errStyle={...T.body,fontSize:11,color:"#f87171",marginTop:3};
-  var selectStyle={...fieldStyle,appearance:"none",WebkitAppearance:"none",cursor:"pointer"};
+  var inp = { width:"100%", padding:"10px 13px", background:"rgba(255,255,255,.07)", border:"1px solid rgba(201,168,76,.28)", borderRadius:9, color:"rgba(245,230,184,.92)", fontSize:14, outline:"none", boxSizing:"border-box" };
+  var lbl = { ...T.body, fontSize:11.5, color:"rgba(201,168,76,.72)", fontWeight:700, letterSpacing:.4, marginBottom:4, display:"block" };
+  var errStyle = { ...T.body, fontSize:11, color:"#f87171", marginTop:3 };
+  var sel = { ...inp, appearance:"none", WebkitAppearance:"none", cursor:"pointer" };
 
-  return(
-    <div onClick={function(e){e.stopPropagation();}} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}}>
-      {/* Backdrop */}
-      <div onClick={onClose} style={{position:"absolute",inset:0,background:"rgba(0,0,0,.75)"}}/>
-      {/* Modal */}
-      <div style={{position:"relative",zIndex:1,background:"rgba(6,22,12,.98)",border:"1px solid rgba(201,168,76,.35)",borderRadius:18,padding:"24px 22px",width:"100%",maxWidth:390,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 12px 48px rgba(0,0,0,.7)"}}>
-        {/* Close */}
-        <button onClick={onClose} style={{position:"absolute",top:14,right:16,background:"none",border:"none",color:"rgba(245,230,184,.5)",fontSize:20,cursor:"pointer",lineHeight:1,padding:4}}>x</button>
+  return (
+    <div onClick={function(e){e.stopPropagation();}} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+      <div onClick={onClose} style={{position:"absolute",inset:0,background:"rgba(0,0,0,.74)"}}/>
+      <div style={{position:"relative",zIndex:1,background:"rgba(6,22,12,.98)",border:"1px solid rgba(201,168,76,.3)",borderRadius:"18px 18px 0 0",padding:"22px 20px 28px",width:"100%",maxWidth:440,maxHeight:"92vh",overflowY:"auto",boxShadow:"0 -8px 40px rgba(0,0,0,.65)"}}>
+        <button onClick={onClose} style={{position:"absolute",top:14,right:16,background:"none",border:"none",color:"rgba(245,230,184,.45)",fontSize:20,cursor:"pointer",lineHeight:1,padding:4,fontWeight:700}}>x</button>
 
-        {success?(
-          <div style={{textAlign:"center",padding:"32px 0"}}>
-            <div style={{fontSize:36,marginBottom:12}}>⛳</div>
+        {success ? (
+          <div style={{textAlign:"center",padding:"28px 0"}}>
+            <div style={{fontSize:36,marginBottom:10}}>⛳</div>
             <div style={{...T.display,color:"rgba(201,168,76,.9)",fontSize:18,fontWeight:800,marginBottom:8}}>You are in.</div>
             <div style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:13.5,lineHeight:1.7}}>Thanks -- we will keep you updated as Teein It Up launches.</div>
           </div>
-        ):(
+        ) : (
           <div>
-            <div style={{...T.display,color:"rgba(201,168,76,.9)",fontSize:19,fontWeight:900,marginBottom:6,paddingRight:24}}>Join Early Access</div>
-            <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:12.5,lineHeight:1.65,marginBottom:20}}>Tell us a little about your golf trips and we will keep you updated as Teein It Up launches.</div>
+            <div style={{...T.display,color:"rgba(201,168,76,.9)",fontSize:18,fontWeight:900,marginBottom:5,paddingRight:28}}>Join Early Access</div>
+            <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12.5,lineHeight:1.6,marginBottom:18}}>Don't miss out on securing your early access spot.</div>
 
-            {/* First Name */}
-            <div style={{marginBottom:14}}>
-              <label style={labelStyle}>First Name</label>
-              <input value={form.firstName} onChange={function(e){handleChange("firstName",e.target.value);}} placeholder="Your first name" style={fieldStyle}/>
-              {errors.firstName&&<div style={errStyle}>{errors.firstName}</div>}
+            <div style={{marginBottom:13}}>
+              <label style={lbl}>First Name</label>
+              <input value={firstName} onChange={function(e){setFirstName(e.target.value);}} placeholder="Your first name" style={inp}/>
+              {errors.firstName && <div style={errStyle}>{errors.firstName}</div>}
             </div>
 
-            {/* Email */}
-            <div style={{marginBottom:14}}>
-              <label style={labelStyle}>Email Address</label>
-              <input type="email" value={form.email} onChange={function(e){handleChange("email",e.target.value);}} placeholder="you@example.com" style={fieldStyle}/>
-              {errors.email&&<div style={errStyle}>{errors.email}</div>}
+            <div style={{marginBottom:13}}>
+              <label style={lbl}>Email Address</label>
+              <input type="email" value={email} onChange={function(e){setEmail(e.target.value);}} placeholder="you@example.com" style={inp}/>
+              {errors.email && <div style={errStyle}>{errors.email}</div>}
             </div>
 
-            {/* Role */}
-            <div style={{marginBottom:14}}>
-              <label style={labelStyle}>Your Role</label>
+            <div style={{marginBottom:18}}>
+              <label style={lbl}>I am:</label>
               <div style={{display:"flex",gap:8}}>
                 {["Player","Organiser","Both"].map(function(v){return(
-                  <button key={v} onClick={function(){handleRole(v);}} style={{flex:1,padding:"9px 0",background:form.role===v?"rgba(201,168,76,.22)":"rgba(255,255,255,.06)",border:"1px solid "+(form.role===v?"rgba(201,168,76,.6)":"rgba(255,255,255,.15)"),borderRadius:9,...T.body,fontSize:13,fontWeight:form.role===v?700:500,color:form.role===v?"rgba(201,168,76,.95)":"rgba(245,230,184,.7)",cursor:"pointer"}}>{v}</button>
+                  <button key={v} onClick={function(){pickRole(v);}} style={{flex:1,padding:"10px 0",background:role===v?"rgba(201,168,76,.22)":"rgba(255,255,255,.05)",border:"1px solid "+(role===v?"rgba(201,168,76,.6)":"rgba(255,255,255,.14)"),borderRadius:9,...T.body,fontSize:13,fontWeight:role===v?700:500,color:role===v?"rgba(201,168,76,.95)":"rgba(245,230,184,.7)",cursor:"pointer"}}>{v}</button>
                 );})}
               </div>
-              {errors.role&&<div style={errStyle}>{errors.role}</div>}
+              {errors.role && <div style={errStyle}>{errors.role}</div>}
             </div>
 
-            {/* Golf Trips Per Year */}
-            <div style={{marginBottom:14}}>
-              <label style={labelStyle}>Golf Trips Per Year</label>
-              <select value={form.tripsPerYear} onChange={function(e){handleChange("tripsPerYear",e.target.value);}} style={selectStyle}>
-                <option value="">Select...</option>
-                <option value="1-2">1-2</option>
-                <option value="3-5">3-5</option>
-                <option value="6+">6+</option>
-              </select>
-              {errors.tripsPerYear&&<div style={errStyle}>{errors.tripsPerYear}</div>}
+            <div style={{marginBottom:18,border:"1px solid rgba(201,168,76,.16)",borderRadius:10,overflow:"hidden"}}>
+              <div onClick={function(){setShowOpt(function(v){return !v;});}} style={{padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",background:"rgba(255,255,255,.03)"}}>
+                <span style={{...T.body,fontSize:12.5,color:"rgba(201,168,76,.58)",fontWeight:600}}>Optional trip details</span>
+                <span style={{fontSize:11,color:"rgba(201,168,76,.45)",transform:showOpt?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s"}}>▼</span>
+              </div>
+              {showOpt && (
+                <div style={{padding:"14px 14px 8px",borderTop:"1px solid rgba(201,168,76,.1)"}}>
+                  <div style={{marginBottom:12}}>
+                    <label style={lbl}>Golf Trips Per Year</label>
+                    <select value={tripsPerYear} onChange={function(e){setTripsPerYear(e.target.value);}} style={sel}>
+                      <option value="">Select...</option>
+                      <option value="1-2">1-2</option>
+                      <option value="3-5">3-5</option>
+                      <option value="6+">6+</option>
+                    </select>
+                  </div>
+                  <div style={{marginBottom:12}}>
+                    <label style={lbl}>Typical Group Size</label>
+                    <select value={groupSize} onChange={function(e){setGroupSize(e.target.value);}} style={sel}>
+                      <option value="">Select...</option>
+                      <option value="Under 8">Under 8</option>
+                      <option value="8-16">8-16</option>
+                      <option value="17-32">17-32</option>
+                      <option value="32+">32+</option>
+                    </select>
+                  </div>
+                  <div style={{marginBottom:6}}>
+                    <label style={lbl}>Next Trip <span style={{opacity:.4}}>(optional)</span></label>
+                    <input value={nextTrip} onChange={function(e){setNextTrip(e.target.value);}} placeholder="e.g. June, September, King Island 2026" style={inp}/>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Group Size */}
-            <div style={{marginBottom:14}}>
-              <label style={labelStyle}>Typical Group Size</label>
-              <select value={form.groupSize} onChange={function(e){handleChange("groupSize",e.target.value);}} style={selectStyle}>
-                <option value="">Select...</option>
-                <option value="Under 8">Under 8</option>
-                <option value="8-16">8-16</option>
-                <option value="17-32">17-32</option>
-                <option value="32+">32+</option>
-              </select>
-              {errors.groupSize&&<div style={errStyle}>{errors.groupSize}</div>}
-            </div>
-
-            {/* Next Trip (optional) */}
-            <div style={{marginBottom:20}}>
-              <label style={labelStyle}>When is your next golf trip? <span style={{opacity:.5}}>(optional)</span></label>
-              <input value={form.nextTrip} onChange={function(e){handleChange("nextTrip",e.target.value);}} placeholder="e.g. March 2026" style={fieldStyle}/>
-            </div>
-
-            {/* Submit */}
-            {submitErr&&<div style={{...T.body,fontSize:12,color:"#f87171",marginBottom:10,textAlign:"center"}}>{submitErr}</div>}
-            <button onClick={handleSubmit} disabled={loading} style={{width:"100%",padding:"14px 0",background:loading?"rgba(201,168,76,.4)":"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:12,...T.body,fontSize:15,fontWeight:900,color:C.greenDeep,cursor:loading?"not-allowed":"pointer",letterSpacing:.3,boxShadow:"0 4px 18px rgba(201,168,76,.4)"}}>
-              {loading?"Submitting...":"Request Early Access →"}
+            {submitErr && <div style={{...T.body,fontSize:12,color:"#f87171",marginBottom:10,textAlign:"center"}}>{submitErr}</div>}
+            <button onClick={handleSubmit} disabled={loading} style={{width:"100%",padding:"14px 0",background:loading?"rgba(201,168,76,.35)":"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:12,...T.body,fontSize:15,fontWeight:900,color:C.greenDeep,cursor:loading?"not-allowed":"pointer",letterSpacing:.3,boxShadow:"0 4px 18px rgba(201,168,76,.38)",marginBottom:8}}>
+              {loading ? "Submitting..." : "Join Early Access →"}
             </button>
           </div>
         )}
@@ -438,6 +460,7 @@ function LeadModal({onClose}) {
     </div>
   );
 }
+
 
 // ─── WINNER OVERLAY ───────────────────────────────────────────────────────────
 function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
@@ -448,22 +471,81 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
   function shareText(msg){doShare(msg,function(){setShareToast(true);setShowSharePanel(false);setTimeout(function(){setShareToast(false);},2800);});setShowSharePanel(false);}
   const MSG_DEMO="Here's the golf trip scoring app Teein It Up.\n\nLive leaderboards, side comps and final results all handled automatically without the admin chaos.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v12.vercel.app/";
   const MSG_GROUP="Here's the golf scoring app we'll be using for the trip.\n\nLive scoring, leaderboard updates, side comps and final results are all handled automatically.\n\nCheck out how it works before the trip:\n\nhttps://app-test-drive-v12.vercel.app/";
-  function buildOrgMsg(){var m="Thought you'd like this -- it's an easy golf trip scoring app called Teein It Up.\n\nLive scoring, automatic leaderboard updates, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo Test Drive:\nhttps://app-test-drive-v12.vercel.app/";return m;}
+  function buildOrgMsg(){var m="Thought you'd like this - it's an easy to use golf trip scoring app called Teein It Up.\n\nLive scoring, automatic leaderboard updates, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo Test Drive:\nhttps://app-test-drive-v12.vercel.app/";return m;}
   function buildResults(){var top=(finalBoard&&finalBoard.length>0?finalBoard:winner?[winner]:[]).slice(0,3);var m="🏆 Teein' It Up Demo Results\n\n";top.forEach(function(p,i){m+=(i+1)+". "+p.name+" — "+p.total+" pts\n";});m+="\nLive leaderboard, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo:\nhttps://app-test-drive-v12.vercel.app/";return m;}
   const SHARE_OPTIONS=[
     {label:"Share with another organiser",msg:buildOrgMsg()},
     {label:"Share with your players",msg:MSG_GROUP},
   ];
   var overlayRef=useRef(null);
+  const [soundOn,setSoundOn]=useState(true);
+  const hasPlayedCelebration=useRef(false);
+  const audioRef=useRef(null);
+
+  // Pre-load audio on mount so it is ready instantly
+  useEffect(function(){
+    try{
+      var a=new Audio("/sounds/crowd-cheer.wav");
+      a.preload="auto";
+      a.volume=0.55;
+      a.addEventListener("canplaythrough",function(){console.log("Celebration audio file loaded");});
+      a.addEventListener("error",function(e){console.log("Celebration audio load error:",e);});
+      audioRef.current=a;
+    }catch(e){console.log("Audio init error:",e);}
+  },[]);
+
   useEffect(()=>{ const t=setTimeout(()=>setVis(true),60); return ()=>clearTimeout(t); },[]);
   useEffect(()=>{ if(overlayRef.current) overlayRef.current.scrollTop=0; },[]);
+  useEffect(()=>{ trackEvent("results_screen_viewed"); },[]);
+
+  // Play celebration when overlay becomes visible
+  useEffect(function(){
+    if(vis&&soundOn&&!hasPlayedCelebration.current){
+      hasPlayedCelebration.current=true;
+      console.log("Attempting celebration sound");
+      var audio=audioRef.current;
+      if(audio){
+        audio.currentTime=0;
+        var p=audio.play();
+        if(p&&typeof p.then==="function"){
+          p.then(function(){console.log("Celebration sound played");}).catch(function(err){
+            console.log("Celebration sound failed:",err);
+          });
+        }
+      } else {
+        // Fallback: create new instance
+        try{
+          var fb=new Audio("/sounds/crowd-cheer.wav");
+          fb.volume=0.55;
+          fb.play().then(function(){console.log("Celebration sound played (fallback)");}).catch(function(err){console.log("Celebration sound failed:",err);});
+        }catch(e){console.log("Celebration audio exception:",e);}
+      }
+    }
+  },[vis,soundOn]);
+
+  function playCelebrationManual(){
+    console.log("Manual celebration triggered");
+    try{
+      var a=new Audio("/sounds/crowd-cheer.wav");
+      a.volume=0.7;
+      a.play().then(function(){console.log("Manual play: success");}).catch(function(e){console.log("Manual play failed:",e);});
+    }catch(e){console.log("Manual play exception:",e);}
+  }
   return (
     <div ref={overlayRef} style={{position:"fixed",inset:0,zIndex:50,background:"rgba(4,14,8,0.96)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",animation:"fadeIn .3s",overflowY:"auto"}}>
       <Confetti/>
       <div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:280,height:280,borderRadius:"50%",pointerEvents:"none",background:"radial-gradient(circle,rgba(201,168,76,.18) 0%,transparent 68%)"}}/>
       <div style={{position:"relative",zIndex:1,textAlign:"center",padding:"16px 24px 20px",width:"100%",maxWidth:390}}>
 
-        {/* Label */}
+        {/* Sound toggle */}
+        <div style={{position:"absolute",top:14,right:16,opacity:vis?1:0,transition:"opacity .5s .5s"}}>
+          <div style={{display:"flex",gap:6}}>
+            <button onClick={(e)=>{e.stopPropagation();try{var a=getAudio();a.currentTime=0;a.volume=0.6;a.play().catch(function(err){console.log("Test play failed:",err);});}catch(x){}}} style={{background:"rgba(255,255,255,.07)",border:"1px solid rgba(201,168,76,.2)",borderRadius:8,padding:"5px 9px",cursor:"pointer",...T.body,fontSize:11,color:"rgba(245,230,184,.5)"}}>&#9654;</button>
+            <button onClick={(e)=>{e.stopPropagation();setSoundOn(function(v){return !v;});}} style={{background:"rgba(255,255,255,.07)",border:"1px solid rgba(201,168,76,.2)",borderRadius:8,padding:"5px 9px",cursor:"pointer",...T.body,fontSize:11,color:"rgba(245,230,184,.55)"}}>{soundOn?"🔊":"🔇"}</button>
+            <button onClick={(e)=>{e.stopPropagation();playCelebrationManual();}} style={{background:"rgba(255,255,255,.07)",border:"1px solid rgba(201,168,76,.2)",borderRadius:8,padding:"5px 9px",cursor:"pointer",...T.body,fontSize:10,color:"rgba(245,230,184,.45)"}}>▶</button>
+          </div>
+        </div>
+      {/* Label */}
         <div style={{...T.body,color:C.goldMid,fontSize:10,fontWeight:700,letterSpacing:3,textTransform:"uppercase",marginBottom:6,opacity:vis?1:0,transition:"opacity .5s .1s"}}>Round 1 Complete</div>
 
         {/* Trophy */}
@@ -479,7 +561,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
         </div>
 
         {/* Score pill */}
-        <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",borderRadius:28,padding:"9px 22px",marginBottom:12,boxShadow:"0 6px 22px rgba(201,168,76,.5)",opacity:vis?1:0,transition:"opacity .5s .38s"}}>
+        <div className="winner-glow" style={{display:"inline-flex",alignItems:"center",gap:8,background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",borderRadius:28,padding:"9px 22px",marginBottom:12,boxShadow:"0 6px 22px rgba(201,168,76,.5)",opacity:vis?1:0,transition:"opacity .5s .38s"}}>
           <span style={{...T.display,color:C.greenDeep,fontSize:26,fontWeight:900}}>{vis?<ScoreCounter target={winner.total}/>:0}</span>
           <span style={{...T.body,color:C.greenDeep,fontSize:12,fontWeight:700}}>Stableford pts</span>
         </div>
@@ -503,7 +585,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
           </div>
         )}
         {/* View Full Leaderboard - secondary ghost */}
-        <button onClick={(e)=>{e.stopPropagation();trackEvent("full_leaderboard_viewed");onClose();}} style={{width:"100%",background:"rgba(12,42,24,.85)",border:"1px solid rgba(201,168,76,.22)",borderTop:"none",borderRadius:0,borderBottomLeftRadius:14,borderBottomRightRadius:14,padding:"12px 0",...T.body,fontSize:13.5,fontWeight:700,color:"rgba(245,230,184,.82)",cursor:"pointer",letterSpacing:.2,marginBottom:24,opacity:vis?1:0,transition:"opacity .5s .62s"}}>View Full Leaderboard →</button>
+        <button onClick={(e)=>{e.stopPropagation();trackEvent("leaderboard_viewed");onClose();}} style={{width:"100%",background:"rgba(12,42,24,.85)",border:"1px solid rgba(201,168,76,.22)",borderTop:"none",borderRadius:0,borderBottomLeftRadius:14,borderBottomRightRadius:14,padding:"12px 0",...T.body,fontSize:13.5,fontWeight:700,color:"rgba(245,230,184,.82)",cursor:"pointer",letterSpacing:.2,marginBottom:24,opacity:vis?1:0,transition:"opacity .5s .62s"}}>View Full Leaderboard →</button>
         {/* Side comp card */}
         <div style={{background:"rgba(8,28,16,.92)",border:"1px solid rgba(201,168,76,.25)",borderRadius:12,padding:"14px 16px",marginBottom:16,textAlign:"left",opacity:vis?1:0,transform:vis?"translateY(0)":"translateY(10px)",transition:"opacity .5s .5s,transform .5s .5s"}}>
           <div style={{...T.body,fontSize:11.5,fontWeight:800,color:C.goldMid,letterSpacing:1.1,textTransform:"uppercase",marginBottom:10}}>Side Comp Winners</div>
@@ -534,7 +616,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
               {label:"Share with your players",ic:"🤼",msg:MSG_GROUP},
               {label:"Share Demo",ic:"📤",msg:MSG_DEMO}
             ].map(function(opt,i){return(
-              <button key={i} className="btn-press" onClick={(e)=>{e.stopPropagation();var ev=i===0?"share_organiser_clicked":i===1?"share_players_clicked":"share_demo_clicked";trackEvent(ev);shareText(opt.msg);}} style={{width:"100%",padding:"14px 18px",background:"rgba(10,38,20,.85)",border:"1px solid rgba(201,168,76,.3)",borderRadius:12,display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 2px 12px rgba(0,0,0,.35)"}}>
+              <button key={i} className="btn-press" onClick={(e)=>{e.stopPropagation();var ev=i===0?"organiser":i===1?"players":"demo";trackEvent("share_clicked",{share_type:ev});shareText(opt.msg);}} style={{width:"100%",padding:"14px 18px",background:"rgba(10,38,20,.85)",border:"1px solid rgba(201,168,76,.3)",borderRadius:12,display:"flex",alignItems:"center",gap:12,cursor:"pointer",boxShadow:"0 2px 12px rgba(0,0,0,.35)"}}>
                 <span style={{fontSize:18,flexShrink:0}}>{opt.ic}</span>
                 <span style={{...T.body,flex:1,fontSize:13.5,fontWeight:700,color:"rgba(245,230,184,.88)",textAlign:"left"}}>{opt.label}</span>
                 <span style={{...T.body,fontSize:13,color:"rgba(201,168,76,.6)",fontWeight:600}}>→</span>
@@ -1392,7 +1474,11 @@ function ScoreEntryScreen({onNext,cfg,dailyHcps,scRes,onScRes}) {
           )}
 
           <div style={{padding:"0 16px 14px"}}>
-            <button onClick={function(){trackEvent("score_submitted",{hole:holeIdx+10});confirm();}} disabled={selected===null} style={{width:"100%",padding:"14px",background:flash?"#16a34a":(selected!==null&&selected>0)?`linear-gradient(135deg,${C.greenBright},#16a34a)`:"rgba(255,255,255,.08)",color:C.white,border:"none",borderRadius:10,fontSize:15,fontWeight:700,...T.body,cursor:(selected!==null&&selected>0)?"pointer":"not-allowed",letterSpacing:.5,transition:"background .2s",boxShadow:selected!==null?"0 4px 16px rgba(22,163,74,.4)":"none"}}>{flash?"✓ Saved!":"✓ Confirm Score"}</button>
+            <button onClick={function(){
+          unlockAudio();
+          trackEvent("score_confirmed",{hole:holeIdx+10});
+          confirm();
+        }} disabled={selected===null} style={{width:"100%",padding:"14px",background:flash?"#16a34a":(selected!==null&&selected>0)?`linear-gradient(135deg,${C.greenBright},#16a34a)`:"rgba(255,255,255,.08)",color:C.white,border:"none",borderRadius:10,fontSize:15,fontWeight:700,...T.body,cursor:(selected!==null&&selected>0)?"pointer":"not-allowed",letterSpacing:.5,transition:"background .2s",boxShadow:selected!==null?"0 4px 16px rgba(22,163,74,.4)":"none"}}>{flash?"✓ Saved!":"✓ Confirm Score"}</button>
           </div>
         </div>
 
@@ -1806,9 +1892,9 @@ export default function App() {
       <div ref={scrollRef} style={{width:"100%",maxWidth:430,minHeight:"100vh",background:C.cream,display:"flex",flexDirection:"column",boxShadow:"0 0 60px rgba(0,0,0,.6)"}} key={demoKey}>
         {screen===1&&<WelcomeScreen onNext={()=>goTo(15)}/>}
         {/* screen 15: role select — organiser goes to setup (2), player jumps to back9 context (36) */}
-        {screen===15&&<TestDriveScreen onOrganiser={()=>goTo(2)} onPlayer={()=>goTo(36)}/>}
+        {screen===15&&<TestDriveScreen onOrganiser={()=>{trackEvent("organiser_path_started");goTo(2);}} onPlayer={()=>{trackEvent("player_path_started");goTo(36);}}/>}
         {screen===2&&<CreateTripScreen cfg={cfg} onCfg={setCfg} onNext={()=>goTo(3)}/>}
-        {screen===3&&<TripOverviewScreen cfg={cfg} dailyHcps={dailyHcps} onDailyHcps={setDailyHcps} onNext={()=>goTo(35)}/>}
+        {screen===3&&<TripOverviewScreen cfg={cfg} dailyHcps={dailyHcps} onDailyHcps={setDailyHcps} onNext={()=>{trackEvent("setup_completed");goTo(35);}}/>}
         {/* screen 35: player moment (organiser path) — feeds into scoring */}
         {screen===35&&<PlayerMomentScreen onNext={()=>goTo(4)}/>}
         {screen===36&&<PlayerMomentScreen onNext={()=>goTo(4)}/>}
