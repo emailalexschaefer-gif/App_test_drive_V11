@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 var _celebAudio = null;
 function getAudio() {
   if (!_celebAudio) {
-    _celebAudio = new Audio('/sounds/crowd-cheer.mp3');
+    _celebAudio = new Audio('/sounds/masters-celebration.mp3');
     _celebAudio.preload = 'auto';
     console.log('Audio file loaded');
   }
@@ -229,6 +229,50 @@ function NavBar({active="home"}) {
 function Divider() { return <div style={{height:1,background:C.parchmentMid,margin:"0 14px"}}/>; }
 function GoldRule() { return <div style={{height:1,margin:"0 20px",background:`linear-gradient(90deg,transparent,${C.gold},transparent)`}}/>; }
 
+// ─── SHARE HELPERS ───────────────────────────────────────────────────
+function generateLeaderboardShareText(board, sideW, tripName) {
+  var url = "https://app-test-drive-v12-2scw.vercel.app/";
+  var msg = "Final results -- " + (tripName||"Golf Trip") + "\n\nLeaderboard:\n";
+  (board||[]).forEach(function(p,i){msg+=(i+1)+". "+p.name+" -- "+p.total+" pts\n";});
+  if (sideW && sideW.length > 0) {
+    msg += "\nSide Comp Winners:\n";
+    sideW.forEach(function(c){
+      // detail is "Full Name — measurement" or "Full Name — Comp Name"
+      var detail = (c.detail || "").trim();
+      // Split on em-dash to get [fullName, suffix]
+      var parts = detail.split(" — ");
+      var fullName = parts[0] ? parts[0].trim() : (c.winnerName || "");
+      var suffix   = parts[1] ? parts[1].trim() : "";
+      // Drop suffix if it just repeats the comp name
+      if (suffix === c.name) suffix = "";
+      if (suffix) {
+        msg += c.name + " -- " + fullName + " -- " + suffix + "\n";
+      } else {
+        msg += c.name + " -- " + fullName + "\n";
+      }
+    });
+  }
+  msg += "\nPowered by Teein It Up\n\nView the app:\n" + url;
+  return msg;
+}
+function generateTripJoinShareText(joinCode) {
+  var url = "https://app-test-drive-v12-2scw.vercel.app/";
+  return "Here's the golf scoring app we'll be using for the trip.\n\n"
+    + "Live scoring, leaderboard updates, side comps and final results are all handled automatically.\n\n"
+    + "Use the code below:\n" + (joinCode||"------") + " -- to join my trip\n\n" + url;
+}
+function shareOrCopyMessage(title, text, onCopied) {
+  if (navigator.share) {
+    navigator.share({title:title, text:text}).catch(function(){});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+      .then(function(){if(onCopied)onCopied();})
+      .catch(function(){try{alert(text);}catch(e){}});
+  } else {
+    try{alert(text);}catch(e){}
+  }
+}
+
 // ─── SHARE LOGIC ─────────────────────────────────────────────────────────────────
 function buildShareMessage(winnerName, winnerScore, tripName) {
   return [
@@ -241,7 +285,7 @@ function buildShareMessage(winnerName, winnerScore, tripName) {
     "Try it:",
     "",
     "Try it yourself:",
-    "https://app-test-drive-v12.vercel.app/"
+    "https://app-test-drive-v12-2scw.vercel.app/"
   ].join("\n");
 }
 
@@ -309,6 +353,7 @@ function LeadModal({onClose}) {
   var [firstName, setFirstName] = useState("");
   var [email, setEmail] = useState("");
   var [role, setRole] = useState("");
+  var [roleType, setRoleType] = useState(window._selectedRoleType||"");
   var [tripsPerYear, setTripsPerYear] = useState("");
   var [groupSize, setGroupSize] = useState("");
   var [nextTrip, setNextTrip] = useState("");
@@ -355,6 +400,7 @@ function LeadModal({onClose}) {
           firstName: firstName || "",
           email: email || "",
           role: role || "",
+          roleType: roleType || "",
           tripsPerYear: tripsPerYear || "",
           groupSize: groupSize || "",
           nextTrip: nextTrip || "",
@@ -469,10 +515,10 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
   const [showSharePanel,setShowSharePanel] = useState(false);
   const [showLeadModal,setShowLeadModal] = useState(false);
   function shareText(msg){doShare(msg,function(){setShareToast(true);setShowSharePanel(false);setTimeout(function(){setShareToast(false);},2800);});setShowSharePanel(false);}
-  const MSG_DEMO="Here's the golf trip scoring app Teein It Up.\n\nLive leaderboards, side comps and final results all handled automatically without the admin chaos.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v12.vercel.app/";
-  const MSG_GROUP="Here's the golf scoring app we'll be using for the trip.\n\nLive scoring, leaderboard updates, side comps and final results are all handled automatically.\n\nCheck out how it works before the trip:\n\nhttps://app-test-drive-v12.vercel.app/";
-  function buildOrgMsg(){var m="Thought you'd like this - it's an easy to use golf trip scoring app called Teein It Up.\n\nLive scoring, automatic leaderboard updates, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo Test Drive:\nhttps://app-test-drive-v12.vercel.app/";return m;}
-  function buildResults(){var top=(finalBoard&&finalBoard.length>0?finalBoard:winner?[winner]:[]).slice(0,3);var m="🏆 Teein' It Up Demo Results\n\n";top.forEach(function(p,i){m+=(i+1)+". "+p.name+" — "+p.total+" pts\n";});m+="\nLive leaderboard, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo:\nhttps://app-test-drive-v12.vercel.app/";return m;}
+  const MSG_DEMO="Here's the golf trip scoring app Teein It Up.\n\nLive leaderboards, side comps and final results all handled automatically without the admin chaos.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v12-2scw.vercel.app/";
+  const MSG_GROUP="Here's the golf scoring app we'll be using for the trip.\n\nLive scoring, leaderboard updates, side comps and final results are all handled automatically.\n\nCheck out how it works before the trip:\n\nhttps://app-test-drive-v12-2scw.vercel.app/";
+  function buildOrgMsg(){var m="Thought you'd like this - it's an easy to use golf trip scoring app called Teein It Up.\n\nLive scoring, automatic leaderboard updates, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo Test Drive:\nhttps://app-test-drive-v12-2scw.vercel.app/";return m;}
+  function buildResults(){var top=(finalBoard&&finalBoard.length>0?finalBoard:winner?[winner]:[]).slice(0,3);var m="🏆 Teein' It Up Demo Results\n\n";top.forEach(function(p,i){m+=(i+1)+". "+p.name+" — "+p.total+" pts\n";});m+="\nLive leaderboard, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo:\nhttps://app-test-drive-v12-2scw.vercel.app/";return m;}
   const SHARE_OPTIONS=[
     {label:"Share with another organiser",msg:buildOrgMsg()},
     {label:"Share with your players",msg:MSG_GROUP},
@@ -485,7 +531,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
   // Pre-load audio on mount so it is ready instantly
   useEffect(function(){
     try{
-      var a=new Audio("/sounds/crowd-cheer.wav");
+      var a=new Audio("/sounds/masters-celebration.mp3");
       a.preload="auto";
       a.volume=0.55;
       a.addEventListener("canplaythrough",function(){console.log("Celebration audio file loaded");});
@@ -515,7 +561,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
       } else {
         // Fallback: create new instance
         try{
-          var fb=new Audio("/sounds/crowd-cheer.wav");
+          var fb=new Audio("/sounds/masters-celebration.mp3");
           fb.volume=0.55;
           fb.play().then(function(){console.log("Celebration sound played (fallback)");}).catch(function(err){console.log("Celebration sound failed:",err);});
         }catch(e){console.log("Celebration audio exception:",e);}
@@ -526,7 +572,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
   function playCelebrationManual(){
     console.log("Manual celebration triggered");
     try{
-      var a=new Audio("/sounds/crowd-cheer.wav");
+      var a=new Audio("/sounds/masters-celebration.mp3");
       a.volume=0.7;
       a.play().then(function(){console.log("Manual play: success");}).catch(function(e){console.log("Manual play failed:",e);});
     }catch(e){console.log("Manual play exception:",e);}
@@ -648,7 +694,7 @@ var WELCOME_SHARE_MSG=[
   "",
   "No spreadsheets, no admin chaos.",
   "",
-  "Try the demo here: https://app-test-drive-v12.vercel.app/"
+  "Try the demo here: https://app-test-drive-v12-2scw.vercel.app/"
 ].join("\n");
 
 function WelcomeScreen({onNext}) {
@@ -670,13 +716,13 @@ function WelcomeScreen({onNext}) {
 
       <div style={{position:"relative",zIndex:2,width:96,height:1,marginTop:12,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,opacity:a?.42:0,transition:"opacity .9s .4s"}}/>
       <div style={{position:"relative",zIndex:2,marginTop:12,padding:"0 32px",textAlign:"center",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",opacity:a?1:0,transform:a?"translateY(0)":"translateY(16px)",transition:"opacity .85s .3s,transform .85s .3s"}}>
-        <div style={{...T.display,color:"#fff",fontSize:26,fontWeight:800,lineHeight:1.25,maxWidth:300,margin:"0 auto 16px",textShadow:"0 2px 16px rgba(0,0,0,.65)"}}>Run Your Next Golf Trip Like a Pro.</div>
+        <div style={{...T.display,color:"#fff",fontSize:26,fontWeight:800,lineHeight:1.25,maxWidth:300,margin:"0 auto 16px",textShadow:"0 2px 16px rgba(0,0,0,.65)"}}>Run Your Next Golf Event Like a Pro.</div>
         <div style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:14.5,lineHeight:1.85,marginBottom:8,textShadow:"0 1px 6px rgba(0,0,0,.35)"}}>
           Live scoring.{" "}Side comps.{" "}Leaderboards.
         </div>
         <div style={{width:40,height:1,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,margin:"10px auto",opacity:.5}}/>
         <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:13.5,lineHeight:1.85,marginBottom:4}}>
-          No admin chaos. Just great golf.
+          No admin chaos. Just great golf experiences.
         </div>
         <div style={{...T.body,color:"rgba(245,230,184,.8)",fontSize:14,fontWeight:600,marginTop:6,textShadow:"0 1px 8px rgba(0,0,0,.4)"}}>
         </div>
@@ -693,32 +739,101 @@ function WelcomeScreen({onNext}) {
 }
 
 // ─── SCREEN 1.5 · TEST DRIVE ───────────────────────────────────────────────────────
-function TestDriveScreen({onOrganiser,onPlayer}) {
+function TestDriveScreen({onOrganiser,onEventOrganiser,onPlayer}) {
   const [a,setA]=useState(false);
+  const [showEventCard,setShowEventCard]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setA(true),100);return()=>clearTimeout(t);},[]);
+
+  // ── Event Organiser info card ──
+  if(showEventCard) return(
+    <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden",background:"#0a1f10",padding:"20px 20px 32px"}}>
+      <div style={{position:"absolute",inset:0,zIndex:0,backgroundImage:'url("https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=900&q=80")',backgroundSize:"cover",backgroundPosition:"center 40%",filter:"brightness(0.3) saturate(1.0)"}}/>
+      <div style={{position:"absolute",inset:0,zIndex:1,background:"linear-gradient(180deg,rgba(4,14,8,.75) 0%,rgba(4,14,8,.65) 50%,rgba(4,14,8,.95) 100%)"}}/>
+      <div className="pop-in" style={{position:"relative",zIndex:2,width:"100%",maxWidth:420}}>
+        {/* Card */}
+        <div style={{background:"rgba(6,22,12,.97)",border:"1px solid rgba(201,168,76,.3)",borderRadius:22,padding:"22px 20px 20px",boxShadow:"0 10px 48px rgba(0,0,0,.65)"}}>
+          {/* Header */}
+          <div style={{textAlign:"center",marginBottom:18}}>
+            <div style={{fontSize:32,marginBottom:8}}>🤝</div>
+            <div style={{...T.display,color:C.goldLight,fontSize:17,fontWeight:900,lineHeight:1.2,marginBottom:8}}>Bring People Together Through Golf</div>
+            <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:13,lineHeight:1.6}}>Create memorable golf experiences that strengthen relationships, build communities and support great causes.</div>
+          </div>
+          {/* 3 benefit tiles */}
+          <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
+            {[
+              {ic:"🤝",title:"Build Relationships",desc:"Client days, referral partner events and networking golf."},
+              {ic:"🏆",title:"Elevate the Experience",desc:"Live scoring, leaderboards, side comps and final results."},
+              {ic:"🎗",title:"Support Causes",desc:"Make charity golf days easier to run, share and celebrate."},
+            ].map(function(b){return(
+              <div key={b.title} style={{display:"flex",gap:12,alignItems:"flex-start",background:"rgba(255,255,255,.05)",border:"1px solid rgba(201,168,76,.12)",borderRadius:14,padding:"12px 14px"}}>
+                <span style={{fontSize:22,flexShrink:0,marginTop:1}}>{b.ic}</span>
+                <div>
+                  <div style={{...T.body,color:C.goldLight,fontWeight:700,fontSize:13.5,marginBottom:3}}>{b.title}</div>
+                  <div style={{...T.body,color:"rgba(245,230,184,.6)",fontSize:12.5,lineHeight:1.55}}>{b.desc}</div>
+                </div>
+              </div>
+            );})}
+          </div>
+          {/* Closing line */}
+          <div style={{...T.body,color:"rgba(245,230,184,.45)",fontSize:12,lineHeight:1.65,textAlign:"center",marginBottom:18}}>Teein' It Up handles the scoring and event management, so you can focus on the relationships, the purpose and the experience.</div>
+          {/* Buttons */}
+          <button className="btn-press" onClick={onEventOrganiser} style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#c08a20 0%,#f0d060 38%,#dbb040 68%,#b87e20 100%)",color:"#0a2010",border:"none",borderRadius:13,...T.body,fontWeight:900,fontSize:16,letterSpacing:.3,cursor:"pointer",boxShadow:"0 5px 24px rgba(201,168,76,.45)",marginBottom:10}}>Continue →</button>
+          <button onClick={function(){setShowEventCard(false);}} style={{width:"100%",background:"none",border:"none",color:"rgba(245,230,184,.35)",fontSize:13,...T.body,cursor:"pointer",padding:"6px 0"}}>Back</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Role selection screen ──
   return(
     <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden",background:"#0a1f10"}}>
-      {/* Background — golfer hitting driver */}
-      <div style={{position:"absolute",inset:0,zIndex:0,backgroundImage:'url("https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=900&q=80")',backgroundSize:"cover",backgroundPosition:"center 40%",filter:"brightness(0.45) saturate(1.1)"}}/>
-      <div style={{position:"absolute",inset:0,zIndex:1,background:"linear-gradient(180deg,rgba(4,14,8,.65) 0%,rgba(4,14,8,.5) 45%,rgba(4,14,8,.9) 100%)"}}/>
-      <div style={{position:"relative",zIndex:2,padding:"0 28px",width:"100%",maxWidth:430,textAlign:"center"}}>
-        {/* Driver image above headline */}
-        <div style={{opacity:a?1:0,transition:"opacity .6s .05s",marginBottom:20}}>
-          <img
-            src="https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=700&q=85&auto=format&fit=crop"
-            alt="Golfer hitting driver"
-            style={{width:"100%",maxWidth:320,height:160,borderRadius:16,objectFit:"cover",objectPosition:"center 35%",boxShadow:"0 8px 36px rgba(0,0,0,.6), 0 0 0 1px rgba(201,168,76,.25)",display:"block",margin:"0 auto"}}
-          />
+      <div style={{position:"absolute",inset:0,zIndex:0,backgroundImage:'url("https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=900&q=80")',backgroundSize:"cover",backgroundPosition:"center 40%",filter:"brightness(0.4) saturate(1.1)"}}/>
+      <div style={{position:"absolute",inset:0,zIndex:1,background:"linear-gradient(180deg,rgba(4,14,8,.7) 0%,rgba(4,14,8,.5) 45%,rgba(4,14,8,.92) 100%)"}}/>
+      <div style={{position:"relative",zIndex:2,padding:"24px 24px 40px",width:"100%",maxWidth:430}}>
+        {/* Hero image */}
+        <div style={{opacity:a?1:0,transition:"opacity .6s .05s",marginBottom:20,textAlign:"center"}}>
+          <img src="https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=700&q=85&auto=format&fit=crop" alt="Golfer" style={{width:"100%",maxWidth:340,height:150,borderRadius:16,objectFit:"cover",objectPosition:"center 35%",boxShadow:"0 8px 36px rgba(0,0,0,.6),0 0 0 1px rgba(201,168,76,.22)",display:"block",margin:"0 auto"}}/>
         </div>
-        <div style={{opacity:a?1:0,transform:a?"translateY(0)":"translateY(16px)",transition:"opacity .65s .15s,transform .65s .15s",marginBottom:28}}>
-          <div style={{...T.display,color:C.white,fontSize:22,fontWeight:800,lineHeight:1.3,marginBottom:14,textShadow:"0 2px 16px rgba(0,0,0,.7)"}}>Get ready to Test Drive<br/>your next golf trip.</div>
-          <div style={{...T.body,color:"rgba(245,230,184,.65)",fontSize:13.5,lineHeight:1.9,marginBottom:6}}>Watch the live scores,<br/>side comp leaders<br/>and leaderboard change in real time.</div>
+        {/* Headline */}
+        <div style={{opacity:a?1:0,transform:a?"translateY(0)":"translateY(14px)",transition:"opacity .6s .15s,transform .6s .15s",textAlign:"center",marginBottom:22}}>
+          <div style={{...T.display,color:C.white,fontSize:21,fontWeight:800,lineHeight:1.25,marginBottom:8,textShadow:"0 2px 16px rgba(0,0,0,.7)"}}>Choose your Test Drive</div>
+          <div style={{...T.body,color:"rgba(245,230,184,.58)",fontSize:13,lineHeight:1.65}}>See how Teein It Up works for your type of golf experience.</div>
         </div>
-        {/* Role selection */}
-        <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:8,opacity:a?1:0,transition:"opacity .6s .45s"}}>
-          <button className="btn-press" onClick={onOrganiser} style={{width:"100%",padding:"16px 24px",background:"linear-gradient(135deg,#c08a20 0%,#f0d060 38%,#dbb040 68%,#b87e20 100%)",color:"#0a2010",border:"none",borderRadius:14,...T.body,fontWeight:900,fontSize:16,letterSpacing:.3,cursor:"pointer",boxShadow:"0 6px 28px rgba(201,168,76,.55)"}}>I'm the organiser →</button>
-          <button className="btn-press" onClick={onPlayer} style={{width:"100%",padding:"15px 24px",background:"rgba(255,255,255,.07)",color:"rgba(245,230,184,.85)",border:"1px solid rgba(201,168,76,.3)",borderRadius:14,...T.body,fontWeight:700,fontSize:15,letterSpacing:.2,cursor:"pointer"}}>I'm a player →</button>
-          <div style={{...T.body,fontSize:11,color:"rgba(245,230,184,.3)",marginTop:4}}>Player? Skip straight to scoring →</div>
+        {/* Role cards */}
+        <div style={{display:"flex",flexDirection:"column",gap:10,opacity:a?1:0,transition:"opacity .6s .38s"}}>
+          {/* Golf Trip Organiser */}
+          <button className="btn-press" onClick={onOrganiser} style={{width:"100%",padding:"0",background:"linear-gradient(135deg,rgba(176,130,28,.22),rgba(240,208,96,.1))",border:"1px solid rgba(201,168,76,.55)",borderRadius:16,cursor:"pointer",overflow:"hidden",boxShadow:"0 4px 20px rgba(201,168,76,.2)",textAlign:"left"}}>
+            <div style={{padding:"16px 18px",display:"flex",alignItems:"center",gap:14}}>
+              <span style={{fontSize:28,flexShrink:0}}>⛳</span>
+              <div style={{flex:1}}>
+                <div style={{...T.body,color:C.goldLight,fontWeight:800,fontSize:15,marginBottom:3}}>Golf Trip Organiser</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:12.5}}>Run your mates trip like a pro.</div>
+              </div>
+              <span style={{color:"rgba(201,168,76,.6)",fontSize:18,flexShrink:0}}>→</span>
+            </div>
+          </button>
+          {/* Event Organiser */}
+          <button className="btn-press" onClick={function(){setShowEventCard(true);}} style={{width:"100%",padding:"0",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.15)",borderRadius:16,cursor:"pointer",overflow:"hidden",textAlign:"left"}}>
+            <div style={{padding:"16px 18px",display:"flex",alignItems:"center",gap:14}}>
+              <span style={{fontSize:28,flexShrink:0}}>🤝</span>
+              <div style={{flex:1}}>
+                <div style={{...T.body,color:"rgba(245,230,184,.9)",fontWeight:700,fontSize:15,marginBottom:3}}>Event Organiser</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.48)",fontSize:12.5}}>Create memorable experiences for clients, teams and causes.</div>
+              </div>
+              <span style={{color:"rgba(255,255,255,.3)",fontSize:18,flexShrink:0}}>→</span>
+            </div>
+          </button>
+          {/* Player */}
+          <button className="btn-press" onClick={onPlayer} style={{width:"100%",padding:"0",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.1)",borderRadius:16,cursor:"pointer",overflow:"hidden",textAlign:"left"}}>
+            <div style={{padding:"15px 18px",display:"flex",alignItems:"center",gap:14}}>
+              <span style={{fontSize:28,flexShrink:0}}>👤</span>
+              <div style={{flex:1}}>
+                <div style={{...T.body,color:"rgba(245,230,184,.75)",fontWeight:600,fontSize:15,marginBottom:3}}>Player</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.38)",fontSize:12.5}}>Skip straight to live scoring.</div>
+              </div>
+              <span style={{color:"rgba(255,255,255,.22)",fontSize:18,flexShrink:0}}>→</span>
+            </div>
+          </button>
         </div>
       </div>
     </div>
@@ -937,9 +1052,12 @@ function TripOverviewScreen({onNext,cfg,dailyHcps,onDailyHcps}) {
             <div style={{...T.body,color:C.goldPale,fontSize:9,letterSpacing:.7}}>ROUNDS</div>
           </div>
         </div>
-        <div style={{background:"rgba(0,0,0,.2)",border:"1px dashed rgba(201,168,76,.45)",borderRadius:8,padding:"8px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{...T.body,color:"rgba(245,230,184,.6)",fontSize:10.5,letterSpacing:.7}}>TRIP JOIN CODE</div>
-          <div style={{...T.display,color:C.goldLight,fontSize:21,fontWeight:700,letterSpacing:3.5}}>{mockTrip.joinCode}</div>
+        <div style={{background:"rgba(0,0,0,.2)",border:"1px dashed rgba(201,168,76,.45)",borderRadius:8,padding:"8px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+          <div>
+            <div style={{...T.body,color:"rgba(245,230,184,.6)",fontSize:10.5,letterSpacing:.7,marginBottom:2}}>TRIP JOIN CODE</div>
+            <div style={{...T.display,color:C.goldLight,fontSize:21,fontWeight:700,letterSpacing:3.5}}>{mockTrip.joinCode}</div>
+          </div>
+          <button className="btn-press" onClick={function(){var msg=generateTripJoinShareText(mockTrip.joinCode);shareOrCopyMessage("Join my golf trip on Teein It Up",msg,function(){try{alert("Link copied!");} catch(e){}});}} style={{padding:"7px 13px",background:"rgba(201,168,76,.18)",border:"1px solid rgba(201,168,76,.4)",borderRadius:9,...T.body,fontSize:12,fontWeight:700,color:C.goldLight,cursor:"pointer",flexShrink:0,whiteSpace:"nowrap"}}>Copy &amp; Share</button>
         </div>
         <GoldRule style={{marginTop:10}}/>
       </div>
@@ -1273,7 +1391,7 @@ function ScoreEntryScreen({onNext,cfg,dailyHcps,scRes,onScRes}) {
     const gh=BACK9_START+i;const hn=gh+1;
     if(!confirmed[i]||back9[i]===null){
       const isPP=ppOn&&hn===ppHole;
-      return{bg:isPP?"rgba(201,168,76,.12)":"rgba(255,255,255,.07)",border:isPP?C.gold+"66":"rgba(255,255,255,.11)",label:`${hn}`,sub:isPP?"⚡":"p"+holePars[gh],tc:isPP?C.goldLight:"rgba(255,255,255,.45)",nc:isPP?C.goldLight:"rgba(255,255,255,.68)"};
+      return{bg:isPP?"rgba(201,168,76,.12)":"rgba(255,255,255,.07)",border:isPP?C.gold+"66":"rgba(255,255,255,.11)",label:`${hn}`,sub:"p"+holePars[gh],tc:isPP?C.goldLight:"rgba(255,255,255,.45)",nc:isPP?C.goldLight:"rgba(255,255,255,.68)"};
     }
     const pts=applyPP(calcPts(back9[i],holePars[gh],activeHcp,hn),hn);
     const{bg,tc}=scoreColors(Math.min(pts,isPPHole?pts:pts));
@@ -1622,8 +1740,8 @@ function LeaderboardScreen({userScores,scRes,cfg,dailyHcps,finalBoard}) {
   const [ctaShareToast,setCtaShareToast]=useState(false);
   const [showCtaPanel,setShowCtaPanel]=useState(false);
   function ctaShareText(msg){var _b=board&&board.length>0?board[0]:null;doShare(msg,function(){setCtaShareToast(true);setShowCtaPanel(false);setTimeout(function(){setCtaShareToast(false);},2800);});setShowCtaPanel(false);}
-  const CTA_MSG_ORG="Thought you'd like this — it's a golf trip scoring app that runs live leaderboards, Stableford scoring, side comps and final results automatically. Could be perfect for your next trip.\n\nhttps://app-test-drive-v12.vercel.app/";
-  const CTA_MSG_PLY="Here's the scoring app we're looking at for the trip. It gives everyone live scoring, side comps, leaderboards and final results without all the spreadsheet/admin chaos.\n\nhttps://app-test-drive-v12.vercel.app/";
+  const CTA_MSG_ORG="Thought you'd like this — it's a golf trip scoring app that runs live leaderboards, Stableford scoring, side comps and final results automatically. Could be perfect for your next trip.\n\nhttps://app-test-drive-v12-2scw.vercel.app/";
+  const CTA_MSG_PLY="Here's the scoring app we're looking at for the trip. It gives everyone live scoring, side comps, leaderboards and final results without all the spreadsheet/admin chaos.\n\nhttps://app-test-drive-v12-2scw.vercel.app/";
   const prevRanks={1:4,2:1,3:6,4:5,5:2,6:3,7:7,8:8};
   const ppOn=cfg?.powerplayOn===true;
   const ppHole=ppOn?(cfg?.powerplayHole??16):null;
@@ -1747,7 +1865,8 @@ function LeaderboardScreen({userScores,scRes,cfg,dailyHcps,finalBoard}) {
                             const{bg,tc}=scoreColors(pts);
                             const holeNum=idx+1;const isPP=ppHole&&holeNum===ppHole;
                             return(
-                              <div key={i} style={{width:30,height:36,borderRadius:6,background:bg,border:`1px solid ${isPP?C.gold:tc+"33"}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",boxShadow:isPP?`0 0 5px ${C.gold}44`:undefined}}>
+                              <div key={i} style={{width:30,height:36,borderRadius:6,background:bg,border:`1px solid ${isPP?C.gold:tc+"33"}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",boxShadow:isPP?`0 0 6px ${C.gold}66`:undefined,position:"relative"}}>
+                                {isPP&&<span style={{position:"absolute",top:1,right:2,fontSize:7,lineHeight:1}}>⚡</span>}
                                 <div style={{...T.body,fontSize:12,fontWeight:700,color:C.ink}}>{sc}</div>
                                 <div style={{...T.body,fontSize:9,fontWeight:600,color:isPP?C.goldDark:tc}}>{pts}pt</div>
                               </div>
@@ -1775,7 +1894,7 @@ function LeaderboardScreen({userScores,scRes,cfg,dailyHcps,finalBoard}) {
         {/* Tagline + Share Results button below leaderboard */}
         <div style={{textAlign:"center",margin:"4px 0 14px",opacity:a?1:0,transition:"opacity .4s .35s"}}>
           <div style={{...T.body,color:C.inkLight,fontSize:12,marginBottom:10}}>Live scoring. No cards. No confusion.</div>
-          <button className="btn-press" onClick={()=>{var top=board?board.slice(0,3):[];var m="🏆 Teein' It Up Demo Results\n\n";top.forEach(function(p,i){m+=(i+1)+". "+p.name+" — "+p.total+" pts\n";});m+="\nLive leaderboard, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo:\nhttps://app-test-drive-v12.vercel.app/";ctaShareText(m);}} style={{padding:"11px 28px",background:`linear-gradient(135deg,${C.greenBright},${C.green})`,border:"none",borderRadius:11,...T.body,fontSize:13,fontWeight:700,color:C.white,cursor:"pointer",letterSpacing:.3,boxShadow:"0 3px 14px rgba(26,71,49,.35)"}}>Share Leaderboard →</button>
+          <button className="btn-press" onClick={()=>{var msg=generateLeaderboardShareText(board,sideW,mockTrip.name);shareOrCopyMessage("Teein It Up Results",msg,function(){setCtaShareToast(true);setTimeout(function(){setCtaShareToast(false);},2800);});}} style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:13,...T.body,fontSize:16,fontWeight:900,color:C.greenDeep,cursor:"pointer",letterSpacing:.3,boxShadow:"0 4px 18px rgba(201,168,76,.4)"}}>Share Leaderboard →</button>
         </div>
 
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,opacity:a?1:0,transition:"opacity .4s .4s"}}>
@@ -1892,7 +2011,7 @@ export default function App() {
       <div ref={scrollRef} style={{width:"100%",maxWidth:430,minHeight:"100vh",background:C.cream,display:"flex",flexDirection:"column",boxShadow:"0 0 60px rgba(0,0,0,.6)"}} key={demoKey}>
         {screen===1&&<WelcomeScreen onNext={()=>goTo(15)}/>}
         {/* screen 15: role select — organiser goes to setup (2), player jumps to back9 context (36) */}
-        {screen===15&&<TestDriveScreen onOrganiser={()=>{trackEvent("organiser_path_started");goTo(2);}} onPlayer={()=>{trackEvent("player_path_started");goTo(36);}}/>}
+        {screen===15&&<TestDriveScreen onOrganiser={()=>{window._selectedRoleType="Golf Trip Organiser";trackEvent("trip_organiser_selected");trackEvent("organiser_path_started");goTo(2);}} onEventOrganiser={()=>{window._selectedRoleType="Event Organiser";trackEvent("event_organiser_selected");goTo(2);}} onPlayer={()=>{window._selectedRoleType="Player";trackEvent("player_selected");trackEvent("player_path_started");goTo(36);}}/>}
         {screen===2&&<CreateTripScreen cfg={cfg} onCfg={setCfg} onNext={()=>goTo(3)}/>}
         {screen===3&&<TripOverviewScreen cfg={cfg} dailyHcps={dailyHcps} onDailyHcps={setDailyHcps} onNext={()=>{trackEvent("setup_completed");goTo(35);}}/>}
         {/* screen 35: player moment (organiser path) — feeds into scoring */}
