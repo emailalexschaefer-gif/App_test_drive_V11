@@ -646,10 +646,17 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
           ))}
         </div>
 
+        {/* Brand support message */}
+        <div style={{textAlign:"center",padding:"12px 4px 4px",opacity:vis?1:0,transition:"opacity .5s .64s"}}>
+          <div style={{...T.body,fontSize:12.5,color:"rgba(245,230,184,.42)",lineHeight:1.65}}>
+            Teein' It Up -- great golf experiences, helping grow the game.
+          </div>
+        </div>
+
         {/* Hero CTA card */}
         <div style={{background:"rgba(6,22,12,.97)",border:"1px solid rgba(201,168,76,.32)",borderRadius:14,padding:"22px 18px 18px",marginBottom:20,opacity:vis?1:0,transition:"opacity .5s .65s",textAlign:"center",boxShadow:"0 6px 28px rgba(0,0,0,.55)"}}>
-          <div style={{...T.display,color:C.goldLight,fontSize:22,fontWeight:900,lineHeight:1.15,marginBottom:10}}>Ready to Run Your Own Golf Trip Like a Pro?</div>
-          <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12.5,lineHeight:1.7,marginBottom:18}}>No admin chaos. Just great golf.</div>
+          <div style={{...T.display,color:C.goldLight,fontSize:22,fontWeight:900,lineHeight:1.15,marginBottom:10}}>Ready to Run Your Own Golf Trip or Event Like a Pro?</div>
+          <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12.5,lineHeight:1.7,marginBottom:18}}>No admin chaos. Just great golf experiences.</div>
           <button className="btn-press" onClick={(e)=>{e.stopPropagation();trackEvent("early_access_clicked");setShowLeadModal(true);}} style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:13,...T.body,fontSize:16,fontWeight:900,color:C.greenDeep,cursor:"pointer",letterSpacing:.3,boxShadow:"0 4px 18px rgba(201,168,76,.4)"}}>Join Early Access →</button>
           <div style={{...T.body,textAlign:"center",color:"rgba(230,195,100,.82)",fontSize:12.5,fontWeight:700,marginTop:14,letterSpacing:.4}}>First 20 Founding Organisers receive free lifetime access</div>
         </div>
@@ -716,7 +723,7 @@ function WelcomeScreen({onNext}) {
 
       <div style={{position:"relative",zIndex:2,width:96,height:1,marginTop:12,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,opacity:a?.42:0,transition:"opacity .9s .4s"}}/>
       <div style={{position:"relative",zIndex:2,marginTop:12,padding:"0 32px",textAlign:"center",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",opacity:a?1:0,transform:a?"translateY(0)":"translateY(16px)",transition:"opacity .85s .3s,transform .85s .3s"}}>
-        <div style={{...T.display,color:"#fff",fontSize:26,fontWeight:800,lineHeight:1.25,maxWidth:300,margin:"0 auto 16px",textShadow:"0 2px 16px rgba(0,0,0,.65)"}}>Run Your Next Golf Event Like a Pro.</div>
+        <div style={{...T.display,color:"#fff",fontSize:26,fontWeight:800,lineHeight:1.25,maxWidth:300,margin:"0 auto 16px",textShadow:"0 2px 16px rgba(0,0,0,.65)"}}>Run Your Golf Trip or Event Like a Pro.</div>
         <div style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:14.5,lineHeight:1.85,marginBottom:8,textShadow:"0 1px 6px rgba(0,0,0,.35)"}}>
           Live scoring.{" "}Side comps.{" "}Leaderboards.
         </div>
@@ -834,6 +841,58 @@ function TestDriveScreen({onOrganiser,onEventOrganiser,onPlayer}) {
               <span style={{color:"rgba(255,255,255,.22)",fontSize:18,flexShrink:0}}>→</span>
             </div>
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN 1.6 · ORGANISER IMMERSION ──────────────────────────────────────────
+function OrganiserImmersionScreen({onNext}) {
+  const [a,setA]=useState(false);
+  useEffect(()=>{const t=setTimeout(()=>setA(true),80);return()=>clearTimeout(t);},[]);
+  return(
+    <div style={{minHeight:"100vh",background:"#081510",display:"flex",flexDirection:"column"}}>
+      {/* Hero — 38% of screen height */}
+      <div style={{position:"relative",width:"100%",height:"38vh",minHeight:220,overflow:"hidden",flexShrink:0}}>
+        <img
+          src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&q=90&auto=format&fit=crop&crop=edges"
+          alt="Cape Wickham King Island"
+          style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 45%",display:"block"}}
+        />
+        {/* Gradient fade to dark */}
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(8,21,16,0) 35%,rgba(8,21,16,.98) 100%)"}}/>
+        {/* Location pill */}
+        <div style={{position:"absolute",top:14,left:14,display:"flex",alignItems:"center",gap:6,background:"rgba(8,21,16,.7)",backdropFilter:"blur(6px)",borderRadius:20,padding:"5px 12px",border:"1px solid rgba(201,168,76,.25)"}}>
+          <span style={{fontSize:12}}>📍</span>
+          <span style={{...T.body,color:"rgba(245,230,184,.75)",fontSize:11.5,fontWeight:600,letterSpacing:.4}}>Cape Wickham, King Island</span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{flex:1,padding:"20px 24px 36px",display:"flex",flexDirection:"column"}}>
+        <div style={{opacity:a?1:0,transform:a?"translateY(0)":"translateY(12px)",transition:"opacity .5s .1s,transform .5s .1s",flex:1,display:"flex",flexDirection:"column"}}>
+          {/* Headline */}
+          <div style={{...T.display,color:C.goldLight,fontSize:28,fontWeight:900,lineHeight:1.15,marginBottom:20}}>Your Weekend Starts Here</div>
+          {/* Short punchy copy */}
+          <p style={{...T.body,color:"rgba(245,230,184,.8)",fontSize:15.5,lineHeight:1.8,marginBottom:4}}>
+            Imagine arriving at one of Australia's most spectacular golf destinations.
+          </p>
+          <div style={{display:"flex",flexDirection:"column",gap:2,marginBottom:20}}>
+            {["8 Players.","2 Rounds.","One unforgettable golf experience."].map(function(line){return(
+              <p key={line} style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:15,lineHeight:1.7,margin:0}}>{line}</p>
+            );})}
+          </div>
+          <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(201,168,76,.28),transparent)",marginBottom:16}}/>
+          <p style={{...T.body,color:"rgba(245,230,184,.48)",fontSize:13.5,lineHeight:1.65,marginBottom:0}}>
+            Now let's get your trip ready.
+          </p>
+          {/* Spacer */}
+          <div style={{flex:1}}/>
+          {/* CTA */}
+          <div style={{opacity:a?1:0,transition:"opacity .5s .4s",paddingTop:24}}>
+            <button className="btn-press" onClick={onNext} style={{width:"100%",padding:"16px 0",background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:13,...T.body,fontSize:17,fontWeight:900,color:C.greenDeep,cursor:"pointer",letterSpacing:.3,boxShadow:"0 6px 24px rgba(201,168,76,.45)"}}>Continue →</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2011,7 +2070,8 @@ export default function App() {
       <div ref={scrollRef} style={{width:"100%",maxWidth:430,minHeight:"100vh",background:C.cream,display:"flex",flexDirection:"column",boxShadow:"0 0 60px rgba(0,0,0,.6)"}} key={demoKey}>
         {screen===1&&<WelcomeScreen onNext={()=>goTo(15)}/>}
         {/* screen 15: role select — organiser goes to setup (2), player jumps to back9 context (36) */}
-        {screen===15&&<TestDriveScreen onOrganiser={()=>{window._selectedRoleType="Golf Trip Organiser";trackEvent("trip_organiser_selected");trackEvent("organiser_path_started");goTo(2);}} onEventOrganiser={()=>{window._selectedRoleType="Event Organiser";trackEvent("event_organiser_selected");goTo(2);}} onPlayer={()=>{window._selectedRoleType="Player";trackEvent("player_selected");trackEvent("player_path_started");goTo(36);}}/>}
+        {screen===15&&<TestDriveScreen onOrganiser={()=>{window._selectedRoleType="Golf Trip Organiser";trackEvent("trip_organiser_selected");trackEvent("organiser_path_started");goTo(16);}} onEventOrganiser={()=>{window._selectedRoleType="Event Organiser";trackEvent("event_organiser_selected");goTo(16);}} onPlayer={()=>{window._selectedRoleType="Player";trackEvent("player_selected");trackEvent("player_path_started");goTo(36);}}/>}
+        {screen===16&&<OrganiserImmersionScreen onNext={()=>goTo(2)}/>}
         {screen===2&&<CreateTripScreen cfg={cfg} onCfg={setCfg} onNext={()=>goTo(3)}/>}
         {screen===3&&<TripOverviewScreen cfg={cfg} dailyHcps={dailyHcps} onDailyHcps={setDailyHcps} onNext={()=>{trackEvent("setup_completed");goTo(35);}}/>}
         {/* screen 35: player moment (organiser path) — feeds into scoring */}
