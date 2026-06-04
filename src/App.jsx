@@ -851,46 +851,76 @@ function TestDriveScreen({onOrganiser,onEventOrganiser,onPlayer}) {
 function OrganiserImmersionScreen({onNext}) {
   const [a,setA]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setA(true),80);return()=>clearTimeout(t);},[]);
+  var tiles=[
+    {ic:"⛳",label:"8 Players"},
+    {ic:"🏌️",label:"2 Rounds"},
+    {ic:"🏆",label:"Side Comps Ready"},
+    {ic:"✨",label:"One Unforgettable Golf Experience"},
+  ];
   return(
-    <div style={{minHeight:"100vh",background:"#081510",display:"flex",flexDirection:"column"}}>
-      {/* Hero — 38% of screen height */}
-      <div style={{position:"relative",width:"100%",height:"38vh",minHeight:220,overflow:"hidden",flexShrink:0}}>
+    <div style={{minHeight:"100vh",background:"#060f08",display:"flex",flexDirection:"column"}}>
+      {/* Hero — coastal cliffs, 38vh */}
+      <div style={{position:"relative",width:"100%",height:"38vh",minHeight:230,overflow:"hidden",flexShrink:0}}>
         <img
-          src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&q=90&auto=format&fit=crop&crop=edges"
-          alt="Cape Wickham King Island"
-          style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 45%",display:"block"}}
+          src="https://images.unsplash.com/photo-1499092346302-a6e8bfcd43e3?w=1200&q=90&auto=format&fit=crop&crop=edges"
+          alt="Coastal golf course"
+          style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 55%",display:"block"}}
         />
-        {/* Gradient fade to dark */}
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(8,21,16,0) 35%,rgba(8,21,16,.98) 100%)"}}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(6,15,8,.1) 30%,rgba(6,15,8,.98) 100%)"}}/>
         {/* Location pill */}
-        <div style={{position:"absolute",top:14,left:14,display:"flex",alignItems:"center",gap:6,background:"rgba(8,21,16,.7)",backdropFilter:"blur(6px)",borderRadius:20,padding:"5px 12px",border:"1px solid rgba(201,168,76,.25)"}}>
-          <span style={{fontSize:12}}>📍</span>
-          <span style={{...T.body,color:"rgba(245,230,184,.75)",fontSize:11.5,fontWeight:600,letterSpacing:.4}}>Cape Wickham, King Island</span>
+        <div style={{position:"absolute",top:14,left:14,display:"flex",alignItems:"center",gap:6,background:"rgba(6,15,8,.72)",backdropFilter:"blur(8px)",borderRadius:20,padding:"5px 13px",border:"1px solid rgba(201,168,76,.28)"}}>
+          <span style={{fontSize:11}}>📍</span>
+          <span style={{...T.body,color:"rgba(245,230,184,.78)",fontSize:11.5,fontWeight:600,letterSpacing:.4}}>Cape Wickham, King Island</span>
         </div>
       </div>
 
       {/* Content */}
-      <div style={{flex:1,padding:"20px 24px 36px",display:"flex",flexDirection:"column"}}>
-        <div style={{opacity:a?1:0,transform:a?"translateY(0)":"translateY(12px)",transition:"opacity .5s .1s,transform .5s .1s",flex:1,display:"flex",flexDirection:"column"}}>
+      <div style={{flex:1,padding:"22px 22px 32px",display:"flex",flexDirection:"column"}}>
+        <div style={{opacity:a?1:0,transform:a?"translateY(0)":"translateY(10px)",transition:"opacity .5s .08s,transform .5s .08s",flex:1,display:"flex",flexDirection:"column"}}>
+
           {/* Headline */}
-          <div style={{...T.display,color:C.goldLight,fontSize:28,fontWeight:900,lineHeight:1.15,marginBottom:20}}>Your Weekend Starts Here</div>
-          {/* Short punchy copy */}
-          <p style={{...T.body,color:"rgba(245,230,184,.8)",fontSize:15.5,lineHeight:1.8,marginBottom:4}}>
-            Imagine arriving at one of Australia's most spectacular golf destinations.
-          </p>
+          <div style={{...T.display,color:C.goldLight,fontSize:27,fontWeight:900,lineHeight:1.15,marginBottom:16}}>Your Weekend Starts Here</div>
+
+          {/* Scene-setting copy */}
           <div style={{display:"flex",flexDirection:"column",gap:2,marginBottom:20}}>
-            {["8 Players.","2 Rounds.","One unforgettable golf experience."].map(function(line){return(
-              <p key={line} style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:15,lineHeight:1.7,margin:0}}>{line}</p>
+            {["The flights are booked.","The tee times are locked in.","The group chat is buzzing."].map(function(line,i){return(
+              <p key={i} style={{...T.body,color:"rgba(245,230,184,.7)",fontSize:14.5,lineHeight:1.7,margin:0}}>{line}</p>
             );})}
           </div>
-          <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(201,168,76,.28),transparent)",marginBottom:16}}/>
-          <p style={{...T.body,color:"rgba(245,230,184,.48)",fontSize:13.5,lineHeight:1.65,marginBottom:0}}>
+
+          {/* Gold divider */}
+          <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(201,168,76,.3),transparent)",marginBottom:18}}/>
+
+          {/* Premium info tiles */}
+          <div style={{display:"flex",flexDirection:"column",gap:9,marginBottom:20}}>
+            {tiles.map(function(t,i){return(
+              <div key={i} style={{
+                display:"flex",alignItems:"center",gap:14,
+                background:"rgba(255,255,255,.05)",
+                border:"1px solid rgba(201,168,76,.16)",
+                borderRadius:12,padding:"12px 16px",
+                opacity:a?1:0,
+                transform:a?"translateX(0)":"translateX(-8px)",
+                transition:"opacity .4s "+(0.18+i*.07)+"s,transform .4s "+(0.18+i*.07)+"s",
+              }}>
+                <span style={{fontSize:20,flexShrink:0}}>{t.ic}</span>
+                <span style={{...T.body,color:"rgba(245,230,184,.85)",fontSize:14,fontWeight:600}}>{t.label}</span>
+              </div>
+            );})}
+          </div>
+
+          {/* Gold divider */}
+          <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(201,168,76,.22),transparent)",marginBottom:16}}/>
+
+          {/* Closing line — centre aligned */}
+          <p style={{...T.body,color:"rgba(245,230,184,.45)",fontSize:13.5,lineHeight:1.6,textAlign:"center",marginBottom:0}}>
             Now let's get your trip ready.
           </p>
-          {/* Spacer */}
+
           <div style={{flex:1}}/>
+
           {/* CTA */}
-          <div style={{opacity:a?1:0,transition:"opacity .5s .4s",paddingTop:24}}>
+          <div style={{paddingTop:22,opacity:a?1:0,transition:"opacity .5s .55s"}}>
             <button className="btn-press" onClick={onNext} style={{width:"100%",padding:"16px 0",background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:13,...T.body,fontSize:17,fontWeight:900,color:C.greenDeep,cursor:"pointer",letterSpacing:.3,boxShadow:"0 6px 24px rgba(201,168,76,.45)"}}>Continue →</button>
           </div>
         </div>
@@ -898,7 +928,6 @@ function OrganiserImmersionScreen({onNext}) {
     </div>
   );
 }
-
 // ─── SCREEN 2 · CREATE TRIP ────────────────────────────────────────────────────
 function CreateTripScreen({onNext,cfg,onCfg}) {
   const [a,setA]=useState(false);
