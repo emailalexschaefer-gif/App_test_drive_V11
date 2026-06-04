@@ -861,12 +861,27 @@ function OrganiserImmersionScreen({onNext}) {
     <div style={{minHeight:"100vh",background:"#060f08",display:"flex",flexDirection:"column"}}>
       {/* Hero — coastal cliffs, 38vh */}
       <div style={{position:"relative",width:"100%",height:"38vh",minHeight:230,overflow:"hidden",flexShrink:0}}>
-        <img
-          src="https://images.unsplash.com/photo-1499092346302-a6e8bfcd43e3?w=1200&q=90&auto=format&fit=crop&crop=edges"
-          alt="Coastal golf course"
-          style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center 55%",display:"block"}}
-        />
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(6,15,8,.1) 30%,rgba(6,15,8,.98) 100%)"}}/>
+        {/* Coastal golf scene — no external dependency */}
+        <div style={{width:"100%",height:"100%",background:"linear-gradient(160deg,#0a2a18 0%,#0d3520 25%,#0a4828 50%,#062010 100%)",position:"relative",overflow:"hidden"}}>
+          {/* Sky */}
+          <div style={{position:"absolute",top:0,left:0,right:0,height:"45%",background:"linear-gradient(180deg,#0a1f35 0%,#0e3248 40%,#1a5c6e 80%,#2a7a5a 100%)"}}/>
+          {/* Ocean */}
+          <div style={{position:"absolute",top:"30%",left:0,right:0,height:"25%",background:"linear-gradient(180deg,#1a5c6e 0%,#0d3d52 60%,#0a2a3a 100%)",opacity:.9}}/>
+          {/* Distant cliffs */}
+          <div style={{position:"absolute",top:"28%",left:"55%",right:0,height:"18%",background:"linear-gradient(180deg,#2a5a38 0%,#1a3d28 100%)",clipPath:"polygon(0 60%,15% 20%,30% 45%,45% 15%,60% 40%,75% 10%,90% 35%,100% 20%,100% 100%,0 100%)"}}/>
+          {/* Fairway — sweeping left to right */}
+          <div style={{position:"absolute",bottom:0,left:0,right:0,height:"55%",background:"linear-gradient(160deg,#1a4a28 0%,#2a6a38 30%,#1e5530 60%,#143820 100%)"}}/>
+          {/* Fairway highlight — the fairway strip */}
+          <div style={{position:"absolute",bottom:"8%",left:"5%",width:"60%",height:"35%",background:"linear-gradient(135deg,rgba(80,160,80,.35) 0%,rgba(60,140,60,.2) 50%,transparent 100%)",borderRadius:"0 60% 20% 0",transform:"skewX(-8deg)"}}/>
+          {/* Sun reflection on water */}
+          <div style={{position:"absolute",top:"32%",left:"20%",width:"30%",height:"8%",background:"linear-gradient(90deg,transparent,rgba(255,220,100,.12),rgba(255,200,60,.18),rgba(255,220,100,.08),transparent)",borderRadius:"50%"}}/>
+          {/* Foreground rough */}
+          <div style={{position:"absolute",bottom:0,left:0,right:0,height:"18%",background:"linear-gradient(180deg,rgba(10,30,16,0) 0%,rgba(6,15,8,.95) 100%)"}}/>
+          {/* Flag silhouette */}
+          <div style={{position:"absolute",bottom:"38%",left:"42%",width:2,height:28,background:"rgba(245,230,184,.4)"}}/>
+          <div style={{position:"absolute",bottom:"58%",left:"43%",width:10,height:7,background:"rgba(201,168,76,.6)",clipPath:"polygon(0 0,100% 50%,0 100%)"}}/>
+        </div>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(6,15,8,.05) 30%,rgba(6,15,8,.98) 100%)"}}/>
         {/* Location pill */}
         <div style={{position:"absolute",top:14,left:14,display:"flex",alignItems:"center",gap:6,background:"rgba(6,15,8,.72)",backdropFilter:"blur(8px)",borderRadius:20,padding:"5px 13px",border:"1px solid rgba(201,168,76,.28)"}}>
           <span style={{fontSize:11}}>📍</span>
