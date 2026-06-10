@@ -941,7 +941,7 @@ function OrganiserImmersionScreen({onNext}) {
 
           {/* Scene-setting copy */}
           <div style={{display:"flex",flexDirection:"column",gap:2,marginBottom:20}}>
-            {["The flights are booked.","The tee times are locked in.","The group chat is buzzing."].map(function(line,i){return(
+            {["The accommodation is booked.","The tee times are locked in.","The group chat is buzzing."].map(function(line,i){return(
               <p key={i} style={{...T.body,color:"rgba(245,230,184,.7)",fontSize:14.5,lineHeight:1.7,margin:0}}>{line}</p>
             );})}
           </div>
