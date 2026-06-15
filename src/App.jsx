@@ -655,7 +655,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
 
         {/* Hero CTA card */}
         <div style={{background:"rgba(6,22,12,.97)",border:"1px solid rgba(201,168,76,.32)",borderRadius:14,padding:"22px 18px 18px",marginBottom:20,opacity:vis?1:0,transition:"opacity .5s .65s",textAlign:"center",boxShadow:"0 6px 28px rgba(0,0,0,.55)"}}>
-          <div style={{...T.display,color:C.goldLight,fontSize:22,fontWeight:900,lineHeight:1.15,marginBottom:10}}>Ready to Run Your Own Golf Trip or Event Like a Pro?</div>
+          <div style={{...T.display,color:C.goldLight,fontSize:22,fontWeight:900,lineHeight:1.15,marginBottom:10}}>Ready to Run Your Own Golf Event Like a Pro?</div>
           <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12.5,lineHeight:1.7,marginBottom:18}}>No admin chaos. Just great golf experiences.</div>
           <button className="btn-press" onClick={(e)=>{e.stopPropagation();trackEvent("early_access_clicked");setShowLeadModal(true);}} style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:13,...T.body,fontSize:16,fontWeight:900,color:C.greenDeep,cursor:"pointer",letterSpacing:.3,boxShadow:"0 4px 18px rgba(201,168,76,.4)"}}>Join Early Access →</button>
           <div style={{...T.body,textAlign:"center",color:"rgba(230,195,100,.82)",fontSize:12.5,fontWeight:700,marginTop:14,letterSpacing:.4}}>First 20 Founding Organisers receive free lifetime access</div>
