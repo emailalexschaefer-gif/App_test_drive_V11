@@ -280,7 +280,7 @@ function buildShareMessage(winnerName, winnerScore, tripName) {
     "",
     winnerName + " wins with " + winnerScore + " points 🏆",
     "",
-    "We just ran this entire golf trip on this app — live leaderboard, side comps and all.",
+    "We just ran this entire event on this app — live leaderboard, side comps and all.",
     "",
     "Try it:",
     "",
@@ -518,7 +518,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
   const MSG_DEMO="Here's Teein It Up -- the golf event app.\n\nLive scoring, leaderboards, side comps and final results are all handled automatically without the admin chaos.\n\nRun your golf event like a pro.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v11.vercel.app/";
   const MSG_GROUP="Here's the golf event app we'll be using.\n\nLive scoring, leaderboard updates, side comps and final results are all handled automatically.\n\nCheck out how it works before the event:\n\nhttps://app-test-drive-v11.vercel.app/";
   function buildOrgMsg(){var m="Thought you'd like this -- it's an easy-to-use golf event app called Teein It Up.\n\nLive scoring, automatic leaderboard updates, side comps and final results are all handled automatically.\n\nPerfect for golf trips, social golf, corporate days and charity events.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v11.vercel.app/";return m;}
-  function buildResults(){var top=(finalBoard&&finalBoard.length>0?finalBoard:winner?[winner]:[]).slice(0,3);var m="🏆 Teein' It Up Demo Results\n\n";top.forEach(function(p,i){m+=(i+1)+". "+p.name+" — "+p.total+" pts\n";});m+="\nLive leaderboard, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo:\nhttps://app-test-drive-v11.vercel.app/";return m;}
+  function buildResults(){var top=(finalBoard&&finalBoard.length>0?finalBoard:winner?[winner]:[]).slice(0,3);var m="🏆 Teein' It Up Demo Results\n\n";top.forEach(function(p,i){m+=(i+1)+". "+p.name+" — "+p.total+" pts\n";});m+="\nLive leaderboard, side comps and final results all handled automatically.\n\nCould be perfect for your next golf event.\n\nTry the demo:\nhttps://app-test-drive-v11.vercel.app/";return m;}
   const SHARE_OPTIONS=[
     {label:"Share with another organiser",msg:buildOrgMsg()},
     {label:"Share with your players",msg:MSG_GROUP},
@@ -603,7 +603,7 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
         {/* Winner name + tagline */}
         <div style={{opacity:vis?1:0,transition:"opacity .6s .3s",marginBottom:10}}>
           <div style={{...T.display,color:"#fff",fontSize:24,fontWeight:900,lineHeight:1.2}}>{winner.name}</div>
-          <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12,marginTop:2}}>You've won the trip.</div>
+          <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12,marginTop:2}}>You're the winner.</div>
         </div>
 
         {/* Score pill */}
@@ -1306,10 +1306,10 @@ function TripOverviewScreen({onNext,cfg,dailyHcps,onDailyHcps}) {
         </div>
         <div style={{background:"rgba(0,0,0,.2)",border:"1px dashed rgba(201,168,76,.45)",borderRadius:8,padding:"8px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
           <div>
-            <div style={{...T.body,color:"rgba(245,230,184,.6)",fontSize:10.5,letterSpacing:.7,marginBottom:2}}>TRIP JOIN CODE</div>
+            <div style={{...T.body,color:"rgba(245,230,184,.6)",fontSize:10.5,letterSpacing:.7,marginBottom:2}}>EVENT JOIN CODE</div>
             <div style={{...T.display,color:C.goldLight,fontSize:21,fontWeight:700,letterSpacing:3.5}}>{mockTrip.joinCode}</div>
           </div>
-          <button className="btn-press" onClick={function(){var msg=generateTripJoinShareText(mockTrip.joinCode);shareOrCopyMessage("Join my golf trip on Teein It Up",msg,function(){try{alert("Link copied!");} catch(e){}});}} style={{padding:"7px 13px",background:"rgba(201,168,76,.18)",border:"1px solid rgba(201,168,76,.4)",borderRadius:9,...T.body,fontSize:12,fontWeight:700,color:C.goldLight,cursor:"pointer",flexShrink:0,whiteSpace:"nowrap"}}>Copy &amp; Share</button>
+          <button className="btn-press" onClick={function(){var msg=generateTripJoinShareText(mockTrip.joinCode);shareOrCopyMessage("Join us on Teein It Up",msg,function(){try{alert("Link copied!");} catch(e){}});}} style={{padding:"7px 13px",background:"rgba(201,168,76,.18)",border:"1px solid rgba(201,168,76,.4)",borderRadius:9,...T.body,fontSize:12,fontWeight:700,color:C.goldLight,cursor:"pointer",flexShrink:0,whiteSpace:"nowrap"}}>Copy &amp; Share</button>
         </div>
         <GoldRule style={{marginTop:10}}/>
       </div>
