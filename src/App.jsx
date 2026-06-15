@@ -232,7 +232,7 @@ function GoldRule() { return <div style={{height:1,margin:"0 20px",background:`l
 // ─── SHARE HELPERS ───────────────────────────────────────────────────
 function generateLeaderboardShareText(board, sideW, tripName) {
   var url = "https://app-test-drive-v11.vercel.app/";
-  var msg = "Final results -- " + (tripName||"Golf Trip") + "\n\nLeaderboard:\n";
+  var msg = "Final Results -- " + (tripName||"Golf Event") + "\n\nLeaderboard:\n";
   (board||[]).forEach(function(p,i){msg+=(i+1)+". "+p.name+" -- "+p.total+" pts\n";});
   if (sideW && sideW.length > 0) {
     msg += "\nSide Comp Winners:\n";
@@ -252,14 +252,14 @@ function generateLeaderboardShareText(board, sideW, tripName) {
       }
     });
   }
-  msg += "\nPowered by Teein It Up\n\nView the app:\n" + url;
+  msg += "\nPowered by Teein It Up\n\nBringing people together through golf.\n\n" + url;
   return msg;
 }
 function generateTripJoinShareText(joinCode) {
   var url = "https://app-test-drive-v11.vercel.app/";
-  return "Here's the golf scoring app we'll be using for the trip.\n\n"
+  return "Here's the golf event app we'll be using.\n\n"
     + "Live scoring, leaderboard updates, side comps and final results are all handled automatically.\n\n"
-    + "Use the code below:\n" + (joinCode||"------") + " -- to join my trip\n\n" + url;
+    + "Use the code below to join:\n" + (joinCode||"------") + "\n\n" + url;
 }
 function shareOrCopyMessage(title, text, onCopied) {
   if (navigator.share) {
@@ -515,9 +515,9 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
   const [showSharePanel,setShowSharePanel] = useState(false);
   const [showLeadModal,setShowLeadModal] = useState(false);
   function shareText(msg){doShare(msg,function(){setShareToast(true);setShowSharePanel(false);setTimeout(function(){setShareToast(false);},2800);});setShowSharePanel(false);}
-  const MSG_DEMO="Here's the golf trip scoring app Teein It Up.\n\nLive leaderboards, side comps and final results all handled automatically without the admin chaos.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v11.vercel.app/";
-  const MSG_GROUP="Here's the golf scoring app we'll be using for the trip.\n\nLive scoring, leaderboard updates, side comps and final results are all handled automatically.\n\nCheck out how it works before the trip:\n\nhttps://app-test-drive-v11.vercel.app/";
-  function buildOrgMsg(){var m="Thought you'd like this - it's an easy to use golf trip scoring app called Teein It Up.\n\nLive scoring, automatic leaderboard updates, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo Test Drive:\nhttps://app-test-drive-v11.vercel.app/";return m;}
+  const MSG_DEMO="Here's Teein It Up -- the golf event app.\n\nLive scoring, leaderboards, side comps and final results are all handled automatically without the admin chaos.\n\nRun your golf event like a pro.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v11.vercel.app/";
+  const MSG_GROUP="Here's the golf event app we'll be using.\n\nLive scoring, leaderboard updates, side comps and final results are all handled automatically.\n\nCheck out how it works before the event:\n\nhttps://app-test-drive-v11.vercel.app/";
+  function buildOrgMsg(){var m="Thought you'd like this -- it's an easy-to-use golf event app called Teein It Up.\n\nLive scoring, automatic leaderboard updates, side comps and final results are all handled automatically.\n\nPerfect for golf trips, social golf, corporate days and charity events.\n\nTry the demo Test Drive here:\nhttps://app-test-drive-v11.vercel.app/";return m;}
   function buildResults(){var top=(finalBoard&&finalBoard.length>0?finalBoard:winner?[winner]:[]).slice(0,3);var m="🏆 Teein' It Up Demo Results\n\n";top.forEach(function(p,i){m+=(i+1)+". "+p.name+" — "+p.total+" pts\n";});m+="\nLive leaderboard, side comps and final results all handled automatically.\n\nCould be perfect for your next golf trip.\n\nTry the demo:\nhttps://app-test-drive-v11.vercel.app/";return m;}
   const SHARE_OPTIONS=[
     {label:"Share with another organiser",msg:buildOrgMsg()},
@@ -695,13 +695,14 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
 
 // ─── SCREEN 1 · WELCOME ───────────────────────────────────────────────────────
 var WELCOME_SHARE_MSG=[
-  "Here's the golf trip scoring app Teein It Up.",
+  "Here's Teein It Up -- the app that helps you run your golf event like a pro.",
   "",
-  "Live leaderboards, side comps, and final results handled automatically.",
+  "Live scoring, leaderboards, side comps and final results all in one place.",
   "",
-  "No spreadsheets, no admin chaos.",
+  "No admin chaos. Just great golf experiences.",
   "",
-  "Try the demo here: https://app-test-drive-v11.vercel.app/"
+  "Try the demo Test Drive here:",
+  "https://app-test-drive-v11.vercel.app/"
 ].join("\n");
 
 function WelcomeScreen({onNext}) {
