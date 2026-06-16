@@ -169,7 +169,7 @@ function TIULogo({size="hero"}) {
       </div>
       <div style={{lineHeight:1}}>
         <div style={{...T.display,color:C.goldLight,fontSize:14,fontWeight:800,letterSpacing:.3}}>Teein' It Up</div>
-        <div style={{...T.body,color:C.goldPale,fontSize:9,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",opacity:.65,marginTop:1}}>Scoring App</div>
+        <div style={{...T.body,color:C.goldPale,fontSize:9,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",opacity:.65,marginTop:1}}>Golf Event App</div>
       </div>
     </div>
   );
@@ -649,14 +649,14 @@ function WinnerOverlay({winner,sideW,onClose,finalBoard}) {
         {/* Brand support message */}
         <div style={{textAlign:"center",padding:"12px 4px 4px",opacity:vis?1:0,transition:"opacity .5s .64s"}}>
           <div style={{...T.body,fontSize:12.5,color:"rgba(245,230,184,.42)",lineHeight:1.65}}>
-            Teein' It Up -- great golf experiences, helping grow the game.
+            Teein' It Up -- bringing people together through golf.
           </div>
         </div>
 
         {/* Hero CTA card */}
         <div style={{background:"rgba(6,22,12,.97)",border:"1px solid rgba(201,168,76,.32)",borderRadius:14,padding:"22px 18px 18px",marginBottom:20,opacity:vis?1:0,transition:"opacity .5s .65s",textAlign:"center",boxShadow:"0 6px 28px rgba(0,0,0,.55)"}}>
           <div style={{...T.display,color:C.goldLight,fontSize:22,fontWeight:900,lineHeight:1.15,marginBottom:10}}>Ready to Run Your Own Golf Event Like a Pro?</div>
-          <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12.5,lineHeight:1.7,marginBottom:18}}>No admin chaos. Just great golf experiences.</div>
+          <div style={{...T.body,color:"rgba(245,230,184,.5)",fontSize:12.5,lineHeight:1.7,marginBottom:18}}>No admin chaos. Just great experiences.</div>
           <button className="btn-press" onClick={(e)=>{e.stopPropagation();trackEvent("early_access_clicked");setShowLeadModal(true);}} style={{width:"100%",padding:"15px 0",background:"linear-gradient(135deg,#b8892a 0%,#f0d060 45%,#c9952a 100%)",border:"none",borderRadius:13,...T.body,fontSize:16,fontWeight:900,color:C.greenDeep,cursor:"pointer",letterSpacing:.3,boxShadow:"0 4px 18px rgba(201,168,76,.4)"}}>Join Early Access →</button>
           <div style={{...T.body,textAlign:"center",color:"rgba(230,195,100,.82)",fontSize:12.5,fontWeight:700,marginTop:14,letterSpacing:.4}}>First 20 Founding Organisers receive free lifetime access</div>
         </div>
@@ -699,7 +699,7 @@ var WELCOME_SHARE_MSG=[
   "",
   "Live scoring, leaderboards, side comps and final results all in one place.",
   "",
-  "No admin chaos. Just great golf experiences.",
+  "No admin chaos. Just great experiences.",
   "",
   "Try the demo Test Drive here:",
   "https://app-test-drive-v11.vercel.app/"
@@ -731,7 +731,7 @@ function WelcomeScreen({onNext}) {
         </div>
         <div style={{width:40,height:1,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,margin:"10px auto",opacity:.5}}/>
         <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:13.5,lineHeight:1.85,marginBottom:4}}>
-          No admin chaos. Just great golf experiences.
+          No admin chaos. Just great experiences.
         </div>
         <div style={{...T.body,color:"rgba(245,230,184,.8)",fontSize:14,fontWeight:600,marginTop:6,textShadow:"0 1px 8px rgba(0,0,0,.4)"}}>
         </div>
@@ -2022,8 +2022,8 @@ function LeaderboardScreen({userScores,scRes,cfg,dailyHcps,finalBoard}) {
   const [ctaShareToast,setCtaShareToast]=useState(false);
   const [showCtaPanel,setShowCtaPanel]=useState(false);
   function ctaShareText(msg){var _b=board&&board.length>0?board[0]:null;doShare(msg,function(){setCtaShareToast(true);setShowCtaPanel(false);setTimeout(function(){setCtaShareToast(false);},2800);});setShowCtaPanel(false);}
-  const CTA_MSG_ORG="Thought you'd like this — it's a golf trip scoring app that runs live leaderboards, Stableford scoring, side comps and final results automatically. Could be perfect for your next trip.\n\nhttps://app-test-drive-v11.vercel.app/";
-  const CTA_MSG_PLY="Here's the scoring app we're looking at for the trip. It gives everyone live scoring, side comps, leaderboards and final results without all the spreadsheet/admin chaos.\n\nhttps://app-test-drive-v11.vercel.app/";
+  const CTA_MSG_ORG="Thought you'd like this -- it's an easy-to-use golf event app that runs live leaderboards, scoring, side comps and final results automatically. Could be perfect for your next golf event.\n\nhttps://app-test-drive-v11.vercel.app/";
+  const CTA_MSG_PLY="Here's the golf event app we're using. It gives everyone live scoring, side comps, leaderboards and final results without all the spreadsheet/admin chaos.\n\nhttps://app-test-drive-v11.vercel.app/";
   const prevRanks={1:4,2:1,3:6,4:5,5:2,6:3,7:7,8:8};
   const ppOn=cfg?.powerplayOn===true;
   const ppHole=ppOn?(cfg?.powerplayHole??16):null;
