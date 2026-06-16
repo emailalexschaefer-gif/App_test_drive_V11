@@ -19,6 +19,9 @@ function unlockAudio() {
 // Replace G-XXXXXXXXXX with your real GA4 Measurement ID in index.html
 function trackEvent(name, params) {
   try {
+    if (typeof window !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+      console.log("GA4 Event:", name, params || {});
+    }
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       window.gtag('event', name, params || {});
     }
