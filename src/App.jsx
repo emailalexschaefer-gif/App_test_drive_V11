@@ -19,10 +19,6 @@ function unlockAudio() {
 // Replace G-XXXXXXXXXX with your real GA4 Measurement ID in index.html
 function trackEvent(name, params) {
   try {
-    var isDev = (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
-    if (typeof window !== 'undefined' && isDev) {
-      console.log("GA4 Event:", name, params || {});
-    }
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       window.gtag('event', name, params || {});
     }
@@ -728,16 +724,23 @@ function WelcomeScreen({onNext}) {
       </div>
 
       <div style={{position:"relative",zIndex:2,width:96,height:1,marginTop:12,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,opacity:a?.42:0,transition:"opacity .9s .4s"}}/>
-      <div style={{position:"relative",zIndex:2,marginTop:12,padding:"0 32px",textAlign:"center",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",opacity:a?1:0,transform:a?"translateY(0)":"translateY(16px)",transition:"opacity .85s .3s,transform .85s .3s"}}>
-        <div style={{...T.display,color:"#fff",fontSize:26,fontWeight:800,lineHeight:1.25,maxWidth:300,margin:"0 auto 16px",textShadow:"0 2px 16px rgba(0,0,0,.65)"}}>Run Your Golf Event Like A Pro.</div>
-        <div style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:14.5,lineHeight:1.85,marginBottom:8,textShadow:"0 1px 6px rgba(0,0,0,.35)"}}>
-          Live scoring.{" "}Side comps.{" "}Leaderboards.
+      <div style={{position:"relative",zIndex:2,marginTop:16,padding:"0 32px",textAlign:"center",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",opacity:a?1:0,transform:a?"translateY(0)":"translateY(16px)",transition:"opacity .85s .3s,transform .85s .3s"}}>
+        <div style={{...T.display,color:"#fff",fontSize:26,fontWeight:800,lineHeight:1.25,maxWidth:300,margin:"0 auto 22px",textShadow:"0 2px 16px rgba(0,0,0,.65)"}}>Run Your Golf Event Like A Pro.</div>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:11,marginBottom:24}}>
+          {[["Social Golf Groups"],["Golf Trips"],["Fundraisers, Charity & Corporate Days"]].map(function(r,i){
+            var icons=["&#9971;&#65039;","&#9992;&#65039;","&#127942;"];
+            return(<div key={i} style={{display:"flex",alignItems:"center",gap:9}}>
+              <span style={{fontSize:14,opacity:.8}} dangerouslySetInnerHTML={{__html:icons[i]}}/>
+              <span style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:13.5,fontWeight:500,letterSpacing:.5}}>{r[0]}</span>
+            </div>);
+          })}
         </div>
-        <div style={{width:40,height:1,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,margin:"10px auto",opacity:.5}}/>
-        <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:13.5,lineHeight:1.85,marginBottom:4}}>
+        <div style={{...T.body,color:"rgba(245,230,184,.38)",fontSize:11.5,letterSpacing:1.5,marginBottom:18,textTransform:"uppercase"}}>
+          Live Scoring &nbsp;&bull;&nbsp; Side Comps &nbsp;&bull;&nbsp; Leaderboards
+        </div>
+        <div style={{width:36,height:1,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,margin:"0 auto 16px",opacity:.38}}/>
+        <div style={{...T.body,color:"rgba(245,230,184,.42)",fontSize:12.5,lineHeight:1.8,letterSpacing:.2}}>
           No admin chaos. Just great experiences.
-        </div>
-        <div style={{...T.body,color:"rgba(245,230,184,.8)",fontSize:14,fontWeight:600,marginTop:6,textShadow:"0 1px 8px rgba(0,0,0,.4)"}}>
         </div>
       </div>
       <div style={{position:"relative",zIndex:2,width:"100%",padding:"18px 24px 44px",display:"flex",flexDirection:"column",alignItems:"center",opacity:a?1:0,transition:"opacity .7s 1.05s"}}>
