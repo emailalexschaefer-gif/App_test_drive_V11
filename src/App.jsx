@@ -739,7 +739,7 @@ function WelcomeScreen({onNext}) {
           Live Scoring &nbsp;&bull;&nbsp; Side Comps &nbsp;&bull;&nbsp; Leaderboards
         </div>
         <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:11,marginBottom:20}}>
-          {[["Social Golf Groups"],["Golf Trips"],["Fundraisers, Charity & Corporate Days"]].map(function(r,i){
+          {[["Social Golf Groups"],["Golf Trips"],["Special Events"]].map(function(r,i){
             var icons=["&#9971;&#65039;","&#9992;&#65039;","&#127942;"];
             return(<div key={i} style={{display:"flex",alignItems:"center",gap:9}}>
               <span style={{fontSize:14,opacity:.8}} dangerouslySetInnerHTML={{__html:icons[i]}}/>
