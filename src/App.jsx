@@ -826,37 +826,37 @@ function TestDriveScreen({onOrganiser,onEventOrganiser,onSocial,onPlayer}) {
           <div style={{...T.display,color:C.white,fontSize:21,fontWeight:800,lineHeight:1.25,marginBottom:8,textShadow:"0 2px 16px rgba(0,0,0,.7)"}}>Choose your Test Drive</div>
           <div style={{...T.body,color:"rgba(245,230,184,.58)",fontSize:13,lineHeight:1.65}}>See how Teein It Up works for your type of golf experience.</div>
         </div>
-        {/* Role cards */}
+        {/* Role cards — order: Social Golf, Golf Trip, Special Events, Player */}
         <div style={{display:"flex",flexDirection:"column",gap:10,opacity:a?1:0,transition:"opacity .6s .38s"}}>
-          {/* Golf Trip Organiser */}
-          <button className="btn-press" onClick={onOrganiser} style={{width:"100%",padding:"0",background:"linear-gradient(135deg,rgba(176,130,28,.22),rgba(240,208,96,.1))",border:"1px solid rgba(201,168,76,.55)",borderRadius:16,cursor:"pointer",overflow:"hidden",boxShadow:"0 4px 20px rgba(201,168,76,.2)",textAlign:"left"}}>
+          {/* Social Golf Groups */}
+          <button className="btn-press" onClick={onSocial} style={{width:"100%",padding:"0",background:"linear-gradient(135deg,rgba(176,130,28,.22),rgba(240,208,96,.1))",border:"1px solid rgba(201,168,76,.55)",borderRadius:16,cursor:"pointer",overflow:"hidden",boxShadow:"0 4px 20px rgba(201,168,76,.2)",textAlign:"left"}}>
             <div style={{padding:"16px 18px",display:"flex",alignItems:"center",gap:14}}>
-              <span style={{fontSize:28,flexShrink:0}}>⛳</span>
+              <span style={{fontSize:28,flexShrink:0}}>🏌️</span>
               <div style={{flex:1}}>
-                <div style={{...T.body,color:C.goldLight,fontWeight:800,fontSize:15,marginBottom:3}}>Golf Trip Organiser</div>
-                <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:12.5}}>Run your mates trip like a pro.</div>
+                <div style={{...T.body,color:C.goldLight,fontWeight:800,fontSize:15,marginBottom:3}}>Social Golf Groups</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.55)",fontSize:12.5}}>Make every round more competitive, social and fun.</div>
               </div>
               <span style={{color:"rgba(201,168,76,.6)",fontSize:18,flexShrink:0}}>→</span>
             </div>
           </button>
-          {/* Event Organiser */}
-          <button className="btn-press" onClick={function(){setShowEventCard(true);}} style={{width:"100%",padding:"0",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.15)",borderRadius:16,cursor:"pointer",overflow:"hidden",textAlign:"left"}}>
+          {/* Golf Trip Organiser */}
+          <button className="btn-press" onClick={onOrganiser} style={{width:"100%",padding:"0",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.15)",borderRadius:16,cursor:"pointer",overflow:"hidden",textAlign:"left"}}>
             <div style={{padding:"16px 18px",display:"flex",alignItems:"center",gap:14}}>
-              <span style={{fontSize:28,flexShrink:0}}>🤝</span>
+              <span style={{fontSize:28,flexShrink:0}}>✈️</span>
               <div style={{flex:1}}>
-                <div style={{...T.body,color:"rgba(245,230,184,.9)",fontWeight:700,fontSize:15,marginBottom:3}}>Event Organiser</div>
-                <div style={{...T.body,color:"rgba(245,230,184,.48)",fontSize:12.5}}>Create memorable experiences for clients, teams and causes.</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.9)",fontWeight:700,fontSize:15,marginBottom:3}}>Golf Trip Organiser</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.48)",fontSize:12.5}}>Run your next golf trip like a pro.</div>
               </div>
               <span style={{color:"rgba(255,255,255,.3)",fontSize:18,flexShrink:0}}>→</span>
             </div>
           </button>
-          {/* Social Golf */}
-          <button className="btn-press" onClick={onSocial} style={{width:"100%",padding:"0",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.13)",borderRadius:16,cursor:"pointer",overflow:"hidden",textAlign:"left"}}>
+          {/* Special Event Organiser */}
+          <button className="btn-press" onClick={function(){setShowEventCard(true);}} style={{width:"100%",padding:"0",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.13)",borderRadius:16,cursor:"pointer",overflow:"hidden",textAlign:"left"}}>
             <div style={{padding:"15px 18px",display:"flex",alignItems:"center",gap:14}}>
-              <span style={{fontSize:28,flexShrink:0}}>👥</span>
+              <span style={{fontSize:28,flexShrink:0}}>🏆</span>
               <div style={{flex:1}}>
-                <div style={{...T.body,color:"rgba(245,230,184,.82)",fontWeight:600,fontSize:15,marginBottom:3}}>Social Golf</div>
-                <div style={{...T.body,color:"rgba(245,230,184,.42)",fontSize:12.5}}>Make your regular round more fun.</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.82)",fontWeight:600,fontSize:15,marginBottom:3}}>Special Event Organiser</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.42)",fontSize:12.5}}>Create memorable experiences for teams, clients and causes.</div>
               </div>
               <span style={{color:"rgba(255,255,255,.25)",fontSize:18,flexShrink:0}}>→</span>
             </div>
@@ -867,7 +867,7 @@ function TestDriveScreen({onOrganiser,onEventOrganiser,onSocial,onPlayer}) {
               <span style={{fontSize:28,flexShrink:0}}>👤</span>
               <div style={{flex:1}}>
                 <div style={{...T.body,color:"rgba(245,230,184,.75)",fontWeight:600,fontSize:15,marginBottom:3}}>Player</div>
-                <div style={{...T.body,color:"rgba(245,230,184,.38)",fontSize:12.5}}>Skip straight to live scoring.</div>
+                <div style={{...T.body,color:"rgba(245,230,184,.38)",fontSize:12.5}}>Experience Teein It Up as a player.</div>
               </div>
               <span style={{color:"rgba(255,255,255,.22)",fontSize:18,flexShrink:0}}>→</span>
             </div>
