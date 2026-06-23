@@ -64,7 +64,7 @@ function InjectCSS() {
       @keyframes rankDown{from{background:rgba(220,38,38,.12)}to{background:transparent}}
       @keyframes trophyBounce{0%,100%{transform:scale(1)}40%{transform:scale(1.06)}70%{transform:scale(0.97)}}
       @keyframes goldGlow{0%,100%{text-shadow:0 2px 18px rgba(201,168,76,.5)}50%{text-shadow:0 2px 40px rgba(201,168,76,1),0 0 60px rgba(201,168,76,.5)}}
-      @keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}80%{opacity:.7}100%{opacity:0;transform:translateY(500px) rotate(540deg) scale(.5)}}
+      @keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}60%{opacity:1}80%{opacity:.65}90%{opacity:.25}100%{opacity:0;transform:translateY(600px) rotate(600deg) scale(.4)}}
       @keyframes toastSlide{from{opacity:0;transform:translateX(-50%) translateY(-10px) scale(.94)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
       @keyframes drivePulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.8)}70%{box-shadow:0 0 0 14px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
       @keyframes leaderPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
@@ -311,17 +311,26 @@ function doShare(msg, onCopied) {
 
 // ─── CONFETTI ─────────────────────────────────────────────────────────────────
 function Confetti() {
-  const pieces = Array.from({length:30},(_,i)=>({
-    id:i, x:5+Math.random()*90,
-    delay:Math.random()*1.2, dur:3.5+Math.random()*1.5,
-    size:4+Math.random()*5,
-    color:i%5===0?"#e8c96a":i%5===1?"#4ade80":i%5===2?"#c9a84c":i%5===3?"#f0d060":"#86efac",
+  // 3 waves: immediate burst, second wave at ~1.5s, fade-in third wave at ~4s
+  const pieces = Array.from({length:55},(_,i)=>({
+    id:i,
+    x:3+Math.random()*94,
+    // Stagger delays across 8 seconds — heavy at start, thin at end
+    delay: i<20 ? Math.random()*1.0
+         : i<38 ? 1.2+Math.random()*1.8
+         : 4.0+Math.random()*2.5,
+    // Longer fall duration for graceful movement
+    dur: 4.5+Math.random()*2.5,
+    size:3+Math.random()*6,
+    color:i%6===0?"#e8c96a":i%6===1?"#4ade80":i%6===2?"#c9a84c":i%6===3?"#f0d060":i%6===4?"#86efac":"#fde68a",
     rotate:Math.random()*360,
+    // Later pieces are more transparent — natural density fade
+    maxOpacity: i<38 ? 1 : 0.55,
   }));
   return (
     <div style={{position:"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0}}>
       {pieces.map(p=>(
-        <div key={p.id} style={{position:"absolute",left:`${p.x}%`,top:"-12px",width:p.size,height:p.size*1.7,background:p.color,borderRadius:2,opacity:0,transform:`rotate(${p.rotate}deg)`,animation:`confettiFall ${p.dur}s ${p.delay}s ease-in forwards`}}/>
+        <div key={p.id} style={{position:"absolute",left:`${p.x}%`,top:"-12px",width:p.size,height:p.size*1.7,background:p.color,borderRadius:2,opacity:0,transform:`rotate(${p.rotate}deg)`,animation:`confettiFall ${p.dur}s ${p.delay}s ease-in forwards`,maxOpacity:p.maxOpacity}}/>
       ))}
     </div>
   );
@@ -726,7 +735,7 @@ function WelcomeScreen({onNext}) {
       <div style={{position:"relative",zIndex:2,width:96,height:1,marginTop:12,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,opacity:a?.42:0,transition:"opacity .9s .4s"}}/>
       <div style={{position:"relative",zIndex:2,marginTop:16,padding:"0 32px",textAlign:"center",flex:1,display:"flex",flexDirection:"column",justifyContent:"center",opacity:a?1:0,transform:a?"translateY(0)":"translateY(16px)",transition:"opacity .85s .3s,transform .85s .3s"}}>
         <div style={{...T.display,color:"#fff",fontSize:26,fontWeight:800,lineHeight:1.25,maxWidth:300,margin:"0 auto 18px",textShadow:"0 2px 16px rgba(0,0,0,.65)"}}>Run Your Golf Event Like A Pro.</div>
-        <div style={{...T.body,color:"rgba(245,230,184,.38)",fontSize:9.5,letterSpacing:2.0,marginBottom:22,textTransform:"uppercase",whiteSpace:"nowrap"}}>
+        <div style={{...T.body,color:"rgba(245,230,184,.65)",fontSize:9.5,letterSpacing:2.0,marginBottom:22,textTransform:"uppercase",whiteSpace:"nowrap"}}>
           Live Scoring &nbsp;&bull;&nbsp; Side Comps &nbsp;&bull;&nbsp; Leaderboards
         </div>
         <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:11,marginBottom:20}}>
@@ -734,12 +743,12 @@ function WelcomeScreen({onNext}) {
             var icons=["&#9971;&#65039;","&#9992;&#65039;","&#127942;"];
             return(<div key={i} style={{display:"flex",alignItems:"center",gap:9}}>
               <span style={{fontSize:14,opacity:.8}} dangerouslySetInnerHTML={{__html:icons[i]}}/>
-              <span style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:13.5,fontWeight:500,letterSpacing:.5}}>{r[0]}</span>
+              <span style={{...T.body,color:"rgba(245,230,184,.90)",fontSize:13.5,fontWeight:500,letterSpacing:.5}}>{r[0]}</span>
             </div>);
           })}
         </div>
         <div style={{width:36,height:1,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`,margin:"0 auto 16px",opacity:.38}}/>
-        <div style={{...T.body,color:"rgba(245,230,184,.42)",fontSize:12.5,lineHeight:1.8,letterSpacing:.2}}>
+        <div style={{...T.body,color:"rgba(245,230,184,.72)",fontSize:12.5,lineHeight:1.8,letterSpacing:.2}}>
           No admin chaos. Just great experiences.
         </div>
       </div>
