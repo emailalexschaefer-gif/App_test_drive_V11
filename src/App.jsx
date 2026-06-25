@@ -1,5 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 
+// ─── EXPERIENCE TERMINOLOGY ──────────────────────────────────────────────────
+var TERMS = {
+  "Social Golf":         {entity:"Group",  details:"Group Details",  overview:"Season Overview",  active:"Active Season",  live:"Live Season",  joinCode:"Group Join Code",  copyShare:"Copy & Share",  nextOverview:"Next: Season Overview",  step1:"Step 1 — Group Details"},
+  "Golf Trip Organiser": {entity:"Trip",   details:"Trip Details",   overview:"Trip Overview",    active:"Active Trip",    live:"Live Trip",    joinCode:"Trip Join Code",   copyShare:"Copy & Share",  nextOverview:"Next: Trip Overview",    step1:"Step 1 — Trip Details"},
+  "Event Organiser":     {entity:"Event",  details:"Event Details",  overview:"Event Overview",   active:"Active Event",   live:"Live Event",   joinCode:"Event Join Code",  copyShare:"Copy & Share",  nextOverview:"Next: Event Overview",   step1:"Step 1 — Event Details"},
+  "Player":              {entity:"Round",  details:"Current Round",  overview:"Live Scoring",     active:"Current Round",  live:"Live Round",   joinCode:"Event Code",       copyShare:"Share",         nextOverview:"Next: Live Scoring",     step1:"Step 1 — Round Details"},
+};
+var DEFAULT_TERMS = TERMS["Golf Trip Organiser"];
+function getTerm(key) {
+  var role = (typeof window !== "undefined" && window._selectedRoleType) || "Golf Trip Organiser";
+  var t = TERMS[role] || DEFAULT_TERMS;
+  return t[key] || DEFAULT_TERMS[key] || key;
+}
+
+
 // ─── CELEBRATION AUDIO ────────────────────────────────────────────────────────
 var _celebAudio = null;
 function getAudio() {
@@ -1144,7 +1159,7 @@ function CreateTripScreen({onNext,cfg,onCfg}) {
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,opacity:a?1:0,transition:"opacity .45s"}}>
           <span style={{fontSize:22}}>🚩</span>
           <div>
-            <div style={{...T.display,fontSize:17,fontWeight:700,color:C.ink}}>Step 1 — Trip Details</div>
+            <div style={{...T.display,fontSize:17,fontWeight:700,color:C.ink}}>{getTerm("step1")}</div>
             <div style={{...T.body,fontSize:12,color:C.inkLight}}>Your trip details</div>
           </div>
         </div>
@@ -1276,7 +1291,7 @@ function CreateTripScreen({onNext,cfg,onCfg}) {
       </div>
       <div style={{padding:"12px 16px 16px",background:C.cream,borderTop:`1px solid ${C.parchmentDark}`,boxShadow:"0 -4px 16px rgba(15,45,28,.07)",flexShrink:0}}>
         {readyMsg&&<div style={{...T.body,fontSize:12.5,fontWeight:700,color:C.greenBright,textAlign:"center",marginBottom:8,animation:"fadeIn .35s"}}>✓ Your trip is ready — jumping into the round…</div>}
-        <GreenBtn label="Next: Trip Overview →" onClick={handleNext}/>
+        <GreenBtn label={getTerm("nextOverview")+" →"} onClick={handleNext}/>
       </div>
       <NavBar active="home"/>
     </div>
@@ -1311,7 +1326,7 @@ function TripOverviewScreen({onNext,cfg,dailyHcps,onDailyHcps}) {
         <GoldRule/>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",margin:"10px 0"}}>
           <div>
-            <div style={{...T.body,color:C.goldMid,fontSize:10.5,fontWeight:700,letterSpacing:1.1,textTransform:"uppercase",marginBottom:3}}>🌏 Active Trip</div>
+            <div style={{...T.body,color:C.goldMid,fontSize:10.5,fontWeight:700,letterSpacing:1.1,textTransform:"uppercase",marginBottom:3}}>🌏 {getTerm("active")}</div>
             <div style={{...T.display,color:C.white,fontSize:19,fontWeight:700,letterSpacing:.2}}>{mockTrip.name}</div>
             <div style={{...T.body,color:C.goldPale,fontSize:12,marginTop:3}}>{mockTrip.course}</div>
           </div>
@@ -1322,7 +1337,7 @@ function TripOverviewScreen({onNext,cfg,dailyHcps,onDailyHcps}) {
         </div>
         <div style={{background:"rgba(0,0,0,.2)",border:"1px dashed rgba(201,168,76,.45)",borderRadius:8,padding:"8px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
           <div>
-            <div style={{...T.body,color:"rgba(245,230,184,.6)",fontSize:10.5,letterSpacing:.7,marginBottom:2}}>EVENT JOIN CODE</div>
+            <div style={{...T.body,color:"rgba(245,230,184,.6)",fontSize:10.5,letterSpacing:.7,marginBottom:2,textTransform:"uppercase"}}>{getTerm("joinCode")}</div>
             <div style={{...T.display,color:C.goldLight,fontSize:21,fontWeight:700,letterSpacing:3.5}}>{mockTrip.joinCode}</div>
           </div>
           <button className="btn-press" onClick={function(){var msg=generateTripJoinShareText(mockTrip.joinCode);shareOrCopyMessage("Join us on Teein It Up",msg,function(){try{alert("Link copied!");} catch(e){}});}} style={{padding:"7px 13px",background:"rgba(201,168,76,.18)",border:"1px solid rgba(201,168,76,.4)",borderRadius:9,...T.body,fontSize:12,fontWeight:700,color:C.goldLight,cursor:"pointer",flexShrink:0,whiteSpace:"nowrap"}}>Copy &amp; Share</button>
@@ -2092,7 +2107,7 @@ function LeaderboardScreen({userScores,scRes,cfg,dailyHcps,finalBoard}) {
 
       <div style={{background:`linear-gradient(135deg,${C.greenDeep} 0%,#1e5c38 100%)`,padding:"10px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid rgba(201,168,76,.25)",flexShrink:0}}>
         <div>
-          <div style={{...T.body,color:C.goldMid,fontSize:10.5,letterSpacing:.8,textTransform:"uppercase"}}>🌏 Live Trip</div>
+          <div style={{...T.body,color:C.goldMid,fontSize:10.5,letterSpacing:.8,textTransform:"uppercase"}}>🌏 {getTerm("live")}</div>
           <div style={{...T.display,color:C.white,fontSize:15,fontWeight:700}}>{mockTrip.name}</div>
         </div>
         <div style={{background:"#16a34a",color:C.white,...T.body,fontSize:12,fontWeight:700,padding:"4px 11px",borderRadius:20,letterSpacing:.3}}>● LIVE</div>
